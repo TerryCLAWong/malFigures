@@ -23,6 +23,21 @@ for the number of shows worked on for a given staff member.
   * MAL profile
   * Relevent characters portrayed
 
+## Dependencies 
+* express
+  * provides lots of handy methods for creating a web service
+  * `npm install express`
+
+* express-validator 
+  * a wrapper for npm's validate.js that allows for custom validators and better-organized error handling
+  * `npm install --save express-validator`
+
+* axios
+  * a web client
+  * to be used with react front-end interact with backend
+  * `cd client`
+  * `npm install axios`
+
 ## Design
 Note: Diagrams made with https://mermaid-js.github.io/mermaid/#/
 
@@ -32,8 +47,8 @@ graph TD;
     C--Sends Parameters-->D
     F--Sends Output-->G
     G--Send Response-->H
+
     subgraph View[View - React & Material UI]
-    
     AA[Select Feature]-->A[Input Parameters]-->B[Press Start]
     H[See Output]
     end
@@ -46,6 +61,7 @@ graph TD;
     subgraph Model[Model - NodeJs]
     D[Receive Parameters]-->E[Scrape Employee Lists]
     E-->F[Generate List Intersection]
+    I[Refresh MAL API Access Token]--Wait Approx. 1h--> I
     end
 
 ```
