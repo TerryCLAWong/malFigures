@@ -1,13 +1,16 @@
 # MyAnimeList.net Staff Tracker - Design Document
 
 ## Purpose
-This is a web-scraping web-app that looks at a given public myanimelist.net anime list 
-and looks at the listed shows within a given rating range and compiles a list of staff
+This is a web-app that looks at a given myanimelist.net user's anime list 
+and analyses the listed shows within a given rating range and compiles a list of staff
 that have worked on those shows. The staff listed is determined by an integer input
-for the number of shows worked on for a given staff member. 
+for the number of shows worked on for a given staff member.
+
+The web-app will be designed such that new features are modular and easily added. 
+In the future, I want this web-app to be home to several stat tracking apps for a myanimelist.net user.
 
 #### Input
-* A url to a public MAL animelist
+* A myanimelist.net username
 * Integers for inclusive [low, high] range scores
 * Integer for shows worked on for a given staff member to be considered a "liked member".
   
