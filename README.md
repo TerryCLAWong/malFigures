@@ -7,7 +7,7 @@ that have worked on those shows. The staff listed is determined by an integer in
 for the number of shows worked on for a given staff member. 
 
 #### Input
-* A url to a MAL animelist
+* A url to a public MAL animelist
 * Integers for inclusive [low, high] range scores
 * Integer for shows worked on for a given staff member to be considered a "liked member".
   
@@ -24,21 +24,28 @@ for the number of shows worked on for a given staff member.
   * Relevent characters portrayed
 
 ## Design
+Note: Diagrams made with https://mermaid-js.github.io/mermaid/#/
 
 ```mermaid
 graph TD;
     B--Sends Request-->C
     C--Sends Parameters-->D
     F--Sends Output-->G
-    subgraph View
-    G[See Output]
-    A[Input Parameters]-->B[Press Start]
+    G--Send Response-->H
+    subgraph View[View - React & Material UI]
+    
+    AA[Select Feature]-->A[Input Parameters]-->B[Press Start]
+    H[See Output]
     end
-    subgraph Controller
+
+    subgraph Controller[Controller - ExpressJs]
     C[Receives Request]
+    G[Generate Response]
     end
-    subgraph Model
-    D[Receive Parameters]-->E[Scrape Employee Lists]-->F[Generate List Intersection]
+
+    subgraph Model[Model - NodeJs]
+    D[Receive Parameters]-->E[Scrape Employee Lists]
+    E-->F[Generate List Intersection]
     end
 
 ```
