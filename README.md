@@ -40,6 +40,9 @@ In the future, I want this web-app to be home to several stat tracking apps for 
   * to be used with react front-end interact with backend
   * `cd client`
   * `npm install axios`
+  
+## Planned Dependencies
+* canvas.js for front-end data representation
 
 ## Design
 Note: Diagrams made with https://mermaid-js.github.io/mermaid/#/
