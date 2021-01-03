@@ -1,4 +1,4 @@
-
+const Errors = require('../../errors/errors')
 const CommonStaff = {}
 
 
@@ -46,15 +46,8 @@ const {validationResult} = require('express-validator/check')
 CommonStaff.getCommonEmployees = function(axios, accessToken) {
     return async (req, res) => {
         //Handle Errors post validation
-        const errors = validationResult(req)
-        if (!errors.isEmpty()) {
-            console.log(errors)
-            res.status(400)
-            res.send({
-                errors : errors.array()
-            })
-            return
-        }
+        ok = Errors.checkValidationErrors(req, res, validationResult)
+        if (ok == true) {return}
 
         //Get Animelist //TODO make this a function so that code does not have to be repeated
         authorization = "Bearer " + accessToken
@@ -101,21 +94,12 @@ CommonStaff.getCommonStudios = function(axios, accessToken) {
     return async (req, res) => {
         console.log("testing")
 
-        //TODO - make this error handling part modular
         //Handle Errors post validation
-        const errors = validationResult(req)
-        if (!errors.isEmpty()) {
-            console.log(errors)
-            res.status(400)
-            res.send({
-                errors : errors.array()
-            })
-            return
-        }
-    }
+        ok = Errors.checkValidationErrors(req, res, validationResult)
+        if (ok == true) {return}
+
+    } 
 }
-
-
 
 //Export
 module.exports = CommonStaff;
