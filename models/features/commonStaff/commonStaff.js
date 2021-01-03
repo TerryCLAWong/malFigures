@@ -1,13 +1,14 @@
 
 const CommonStaff = {}
 
-const {body} = require('express-validator/check')
+
 /*
-Validates request body parameters for getCommonStaff
+Validates request body parameters for CommonStaff
 */
+const {body} = require('express-validator/check')
 CommonStaff.validate = (method) => {
     switch (method) {
-        case "getCommonStaff": {
+        case "getCommonEmployees": {
             return [
                 body("userName").custom((value, {req}) => {
                     if (typeof value == "string") {
@@ -45,7 +46,7 @@ CommonStaff.validate = (method) => {
 
 
 const {validationResult} = require('express-validator/check')
-CommonStaff.getCommonStaff = function(axios, accessToken) {
+CommonStaff.getCommonEmployees = function(axios, accessToken) {
     return async (req, res) => {
         //Handle Errors post validation
         const errors = validationResult(req)

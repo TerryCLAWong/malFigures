@@ -6,9 +6,13 @@ const router = express.Router();
 
 
 accessToken = process.env.ACCESS_TOKEN
-router.get('/commonStaff',
-    MalInfo.commonStaff.validate('getCommonStaff'),
-    MalInfo.commonStaff.getCommonStaff(axios, accessToken)
+
+/*
+Common Staff
+*/
+router.get('/commonEmployees',
+    MalInfo.commonStaff.validate('getCommonEmployees'),
+    MalInfo.commonStaff.getCommonEmployees(axios, accessToken)
 )
 
 
