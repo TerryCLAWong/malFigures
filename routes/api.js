@@ -15,6 +15,11 @@ router.get('/commonEmployees',
     MalInfo.commonStaff.getCommonEmployees(axios, accessToken)
 )
 
+router.get('/commonStudios',
+    MalInfo.commonStaff.validate('getCommonStudios'),
+    MalInfo.commonStaff.getCommonStudios(axios, accessToken)
+)
+
 
 //not used maybe delete
 router.post('/todos', (req, res, next) => {
