@@ -45,6 +45,7 @@ In the future, I want this web-app to be home to several stat tracking apps for 
   
 * dotenv
   * for loading environmental variables from env.json
+  * `npm install dotenv`
 
 
 ## Design
