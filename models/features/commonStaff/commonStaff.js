@@ -45,30 +45,62 @@ CommonStaff.validate = (method) => {
 
 
 const {validationResult} = require('express-validator/check')
-CommonStaff.getCommonStaff = (req, res) => {
-    //Handle Errors post validation
-    const errors = validationResult(req)
-    if (!errors.isEmpty()) {
-        console.log(errors)
-        res.status(400)
-        res.send({
-            errors : errors.array()
-        })
-        return
+CommonStaff.getCommonStaff = function(axios, accessToken) {
+    return async (req, res) => {
+        //Handle Errors post validation
+        const errors = validationResult(req)
+        if (!errors.isEmpty()) {
+            console.log(errors)
+            res.status(400)
+            res.send({
+                errors : errors.array()
+            })
+            return
+        }
+
+        //Get Animelist //TODO make this a function so that code does not have to be repeated
+        authorization = "Bearer " + accessToken
+        result = await axios({   
+            method: "get",
+            url: "https://api.myanimelist.net/v2/users/" + req.body.userName + "/animelist?",
+            params: {
+                "fields" : "list_status"
+            },
+            headers: {
+                "Authorization" : authorization
+            }
+        }).then(
+            (response) => {
+                console.log("Sucessful GET animelist: " + req.body.userName)
+                //console.log(response.data)
+                /*
+                DATA = getStaffIntersection??
+                */
+                return {ok: true, data: "DATA"}
+            }
+        ).catch(
+            (error) => {
+                console.log("Failed GET animelist: " + req.body.userName)
+                res.status(502)
+                res.send({
+                    error : "User not found: " + req.body.userName
+                })
+                return {ok: true, data: null}
+            }
+        )
+        
+        //On Successful 
+        if (result.ok == true) {
+            console.log("all good")
+            res.send({
+                "employeeList" : "TODO - object containing lots of stuff about employees"
+            })
+        }
     }
-
-    //TODO do api stuff etc etc and make a response
-
-    console.log("all good")
-    res.send({
-        "message" : "all gooch"
-    })
 }
-/*
-function getCommonStaff(username, upper, lower, commonAnimeCount) {
-    console.log(username, upper, lower, commonAnimeCount)
-}
-*/
+
+
+
 
 
 //Export

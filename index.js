@@ -15,13 +15,13 @@ app.use((req, res, next) => {
 })
 
 app.use(bodyParser.json())
-
+//TODO add middle wear to refresh access token
 app.use('/api', routes);
 
 app.use((err, req, res, next) => {
     console.log(err);
     next()
-  })
+})
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`)

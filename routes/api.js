@@ -1,11 +1,14 @@
 const express = require ('express');
-const router = express.Router();
 const MalInfo = require('../models/malInfo');
+const axios = require('axios');
+require('dotenv').config();
+const router = express.Router();
 
 
+accessToken = process.env.ACCESS_TOKEN
 router.get('/commonStaff',
     MalInfo.commonStaff.validate('getCommonStaff'),
-    MalInfo.commonStaff.getCommonStaff
+    MalInfo.commonStaff.getCommonStaff(axios, accessToken)
 )
 
 
