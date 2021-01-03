@@ -37,9 +37,15 @@ In the future, I want this web-app to be home to several stat tracking apps for 
 
 * axios
   * a web client
-  * to be used with react front-end interact with backend
+  * to be used with react front-end interact with backend api
+  * to be used by backend to make requests to MAL (myanimelist) api
+  * `npm install axios`
   * `cd client`
   * `npm install axios`
+  
+* dotenv
+  * for loading environmental variables from env.json
+
 
 ## Design
 Note: Diagrams made with https://mermaid-js.github.io/mermaid/#/
