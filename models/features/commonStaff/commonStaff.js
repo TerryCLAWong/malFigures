@@ -47,42 +47,18 @@ CommonStaff.getCommonEmployees = function(axios, accessToken) {
     return async (req, res) => {
         //Handle Errors post validation
         ok = Errors.checkValidationErrors(req, res, validationResult)
-        if (ok == true) {return}
+        if (ok == false) {
+            console.log("aaaaaa")
+            return
+        }
 
-        //Get Animelist //TODO make this a function so that code does not have to be repeated
-        authorization = "Bearer " + accessToken
-        result = await axios({   
-            method: "get",
-            url: "https://api.myanimelist.net/v2/users/" + req.body.userName + "/animelist?",
-            params: {
-                "fields" : "list_status"
-            },
-            headers: {
-                "Authorization" : authorization
-            }
-        }).then(
-            (response) => {
-                console.log("Sucessful GET animelist: " + req.body.userName)
-                //console.log(response.data)
-                /*
-                DATA = getStaffIntersection??
-                */
-                return {ok: true, data: "DATA"}
-            }
-        ).catch(
-            (error) => {
-                console.log("Failed GET animelist: " + req.body.userName)
-                res.status(502)
-                res.send({
-                    error : "User not found: " + req.body.userName
-                })
-                return {ok: true, data: null}
-            }
-        )
+        //Get Animelist
+        result = await getAnimeList(req, axios, accessToken)
         
         //On Successful 
-        if (result.ok == true) {
+        if (result.error == null) {
             console.log("all good")
+            res.status(200)
             res.send({
                 "employeeList" : "TODO - object containing lots of stuff about employees"
             })
@@ -92,13 +68,52 @@ CommonStaff.getCommonEmployees = function(axios, accessToken) {
 
 CommonStaff.getCommonStudios = function(axios, accessToken) {
     return async (req, res) => {
-        console.log("testing")
-
         //Handle Errors post validation
         ok = Errors.checkValidationErrors(req, res, validationResult)
-        if (ok == true) {return}
+        if (ok == false) {return}
 
+        //Get Animelist
+        result = await getAnimeList(req, axios, accessToken)
+
+        if (result.error == null) {
+            console.log("all good")
+            res.status(200)
+            res.send({
+                "studioList" : "TODO - object containing lots of stuff about studios"
+            })
+        } else {
+            res.status(502)
+            res.send(result.error)
+        }
     } 
+}
+
+async function getAnimeList(req, axios, accessToken) {
+    authorization = "Bearer " + accessToken
+    result = await axios({   
+        method: "get",
+        url: "https://api.myanimelist.net/v2/users/" + req.body.userName + "/animelist?",
+        params: {
+            "fields" : "list_status"
+        },
+        headers: {
+            "Authorization" : authorization
+        }
+    }).then(
+        (response) => {
+            console.log("Sucessful GET animelist: " + req.body.userName)
+            //TODO loop until animelist pages empty
+            return {error: null, data: "DATA"}
+        }
+    ).catch(
+        (error) => {
+            console.log("Failed GET animelist: " + req.body.userName)
+            MALAPIError = {"MAL API Error": error.response.data.error}
+            return {error: MALAPIError, data: null}
+        }
+    )
+
+    return result
 }
 
 //Export
