@@ -25,6 +25,13 @@ In the future, I want this web-app to be home to several stat tracking apps for 
   * Name
   * MAL profile
   * Relevent characters portrayed
+  
+## Setup
+* have node.js installed
+* clone repo
+* install dependencies (listed below)
+* create .env file containing an `ACCESS_TOKEN` variable containing your MAL API access token. To generate one, follow the instructions here: https://myanimelist.net/blog.php?eid=835707
+* `node index.js`
 
 ## Dependencies 
 * express
