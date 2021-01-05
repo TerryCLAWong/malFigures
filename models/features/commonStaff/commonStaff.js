@@ -74,17 +74,24 @@ CommonStaff.getCommonStudios = function(axios, accessToken) {
 
         //Get Animelist
         result = await getAnimeList(req, axios, accessToken)
-
-        if (result.error == null) {
-            console.log("all good")
-            res.status(200)
-            res.send({
-                "studioList" : "TODO - object containing lots of stuff about studios"
-            })
-        } else {
+        if (result.error != null) {
             res.status(502)
             res.send(result.error)
         }
+
+        //TODO get common studios functionality to generate data
+
+        filteredAnimelist = removeScoreOutofRange(result.animeList, req.body.upper, req.body.lower)
+        console.log(filteredAnimelist)
+
+
+        //Send generated data back to client
+        console.log("all good") //todo - remove
+        res.status(200)
+        res.send({
+            "studioList" : "TODO - object containing lots of stuff about studios"
+        })
+        
     } 
 }
 
@@ -95,7 +102,7 @@ async function getAnimeList(req, axios, accessToken) {
         url: "https://api.myanimelist.net/v2/users/" + req.body.userName + "/animelist?",
         params: {
             "fields" : "list_status",
-            "limit" : 1000,
+            "limit" : 1000, //limit max to maximize speed
         },
         headers: {
             "Authorization" : authorization
@@ -103,26 +110,24 @@ async function getAnimeList(req, axios, accessToken) {
     }).then(
         async function thing(response) {
             console.log("Sucessful GET animelist: " + req.body.userName)//todo remove
-            //TODO- comment this better
             //Get Animelist
             data = response.data
             result = await getAnimePages(data, axios, authorization)
 
+            //Return
             if (result.error == null) {
                 return {error: null, animeList: result.animeList}
             }
-            return {error: result.error}    
+            MALAPIError = {"MAL API Error": result.error}
+            return {error: MALAPIError}    
         }
     ).catch(
         (error) => {
-            console.log(error)
             console.log("Failed GET animelist: " + req.body.userName) //todo remove
             MALAPIError = {"MAL API Error": error.response.data.error}
             return {error: MALAPIError, data: null}
         }
     )
-
-    console.log(result)
     return result
 }
 
@@ -147,10 +152,8 @@ async function getAnimePages(data, axios) {
             }).catch((error) => {
                 console.log("Failed to get a page from the animelist")
                 return {
-                    error : {
-                        MALAPIError : error.response.data.error
-                    },
-                    data: null
+                    error : error.response.data.error,
+                    data : null
                 }
             })
 
@@ -185,6 +188,19 @@ async function getAnimePages(data, axios) {
             nextURL = data.paging.next
         }
     }
+}
+
+/*
+Filters the animeList be removing objects that have a score outside of the [lower,upper] range
+*/
+function removeScoreOutofRange(animeList, upper, lower) {
+    for (const animeId in animeList) {
+        animeScore = animeList[animeId].score
+        if (animeScore < lower || animeScore > upper) {
+            delete animeList[animeId]
+        }
+    }
+    return animeList
 }
 
 //Export
