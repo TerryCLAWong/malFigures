@@ -94,7 +94,8 @@ async function getAnimeList(req, axios, accessToken) {
         method: "get",
         url: "https://api.myanimelist.net/v2/users/" + req.body.userName + "/animelist?",
         params: {
-            "fields" : "list_status"
+            "fields" : "list_status",
+            "limit" : 1000,
         },
         headers: {
             "Authorization" : authorization
@@ -135,8 +136,6 @@ async function getAnimePages(data, axios) {
     while (true) {
         //Get next set of animes
         if (nextURL != null) { //ignore first page
-            //todo organize this and comment it better
-            
             //Get next URL's response
             result = await axios.get(nextURL, {headers: {"Authorization": authorization}}
             ).then((response) => {
