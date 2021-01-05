@@ -68,6 +68,7 @@ CommonStaff.getCommonEmployees = function(axios, accessToken) {
 
 CommonStaff.getCommonStudios = function(axios, accessToken) {
     return async (req, res) => {
+        console.log("Getting common anime studios")
         //Handle Errors post validation
         ok = Errors.checkValidationErrors(req, res, validationResult)
         if (ok == false) {return}
@@ -78,12 +79,13 @@ CommonStaff.getCommonStudios = function(axios, accessToken) {
             res.status(502)
             res.send(result.error)
         }
-
-        //TODO get common studios functionality to generate data
-
+        //Remove anime out of score range
         filteredAnimelist = removeScoreOutofRange(result.animeList, req.body.upper, req.body.lower)
-        console.log(filteredAnimelist)
-
+        console.log("Filtered score animelist\n", filteredAnimelist, "\n")
+        //Appending animelist with studio names
+        animeList = await appendStudioNames(filteredAnimelist, axios, authorization)
+        console.log("Animelist with studios\n", animeList)
+        //Generating common studios
 
         //Send generated data back to client
         console.log("all good") //todo - remove
@@ -200,7 +202,62 @@ function removeScoreOutofRange(animeList, upper, lower) {
             delete animeList[animeId]
         }
     }
+    console.log("Filtered scores")
     return animeList
+}
+
+/*
+Appends studio name to each object mapped to by animeId
+*/
+async function appendStudioNames(animeList, axios, authorization) {
+    for (const animeId in animeList) {
+        //Get studio name
+        result = await getStudios(animeId, axios, authorization)
+        if (result.error != null) {
+            console.log("Failed to get studio for: ", animeList[animeId])
+            console.log("Error: " + result.error)
+            continue
+        } 
+        //Add studio name to object
+        animeList[animeId].studios = result.studios
+    }
+    console.log("Gotten studio names")
+    return animeList
+}
+
+/*
+Return object:
+{
+    error: <error string from mal api response>
+    studios: <array of anime studios>
+}
+*/
+async function getStudios(animeId, axios, authorization) {
+    result = await axios({   
+        method: "get",
+        url: "https://api.myanimelist.net/v2/anime/" + animeId,
+        params: {
+            "fields" : "studios"
+        },
+        headers: {
+            "Authorization" : authorization
+        }
+    }).then(
+        (response) => {
+            return {
+                error: null,
+                studios: response.data.studios
+            }
+        }
+    ).catch(
+        (error) => {
+            return {
+                error: error.response.data.error,
+                studios: null
+            }
+        }
+    )
+    return result
 }
 
 //Export
