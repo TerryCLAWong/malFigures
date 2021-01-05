@@ -100,20 +100,92 @@ async function getAnimeList(req, axios, accessToken) {
             "Authorization" : authorization
         }
     }).then(
-        (response) => {
-            console.log("Sucessful GET animelist: " + req.body.userName)
-            //TODO loop until animelist pages empty
-            return {error: null, data: "DATA"}
+        async function thing(response) {
+            console.log("Sucessful GET animelist: " + req.body.userName)//todo remove
+            //TODO- comment this better
+            //Get Animelist
+            data = response.data
+            result = await getAnimePages(data, axios, authorization)
+
+            if (result.error == null) {
+                return {error: null, animeList: result.animeList}
+            }
+            return {error: result.error}    
         }
     ).catch(
         (error) => {
-            console.log("Failed GET animelist: " + req.body.userName)
+            console.log(error)
+            console.log("Failed GET animelist: " + req.body.userName) //todo remove
             MALAPIError = {"MAL API Error": error.response.data.error}
             return {error: MALAPIError, data: null}
         }
     )
 
+    console.log(result)
     return result
+}
+
+async function getAnimePages(data, axios) {
+    nextURL = null
+    animeList = {}
+    /*
+    The successful response does not return all anime in the animelist
+    More are given in response.paging.next
+    */
+    while (true) {
+        //Get next set of animes
+        if (nextURL != null) { //ignore first page
+            //todo organize this and comment it better
+            
+            //Get next URL's response
+            result = await axios.get(nextURL, {headers: {"Authorization": authorization}}
+            ).then((response) => {
+                console.log("finished reading anime page")
+                return {
+                    error: null,
+                    data : response.data
+                }
+            }).catch((error) => {
+                console.log("Failed to get a page from the animelist")
+                return {
+                    error : {
+                        MALAPIError : error.response.data.error
+                    },
+                    data: null
+                }
+            })
+
+            //Set next set of data if applicable
+            if (result.error == null) {
+                data = result.data
+            } else {
+                return {
+                    error: result.error,
+                    status: 502,
+                    message: "Failed to get a page from the animelist" //todo - maybe not needed
+                }
+            }
+        }
+
+        //Append entries to animeList
+        for (let animeEntry of data.data) {
+            //Get needed values
+            animeId = animeEntry.node.id
+            anime = {}
+            anime.score = animeEntry.list_status.score
+            anime.title = animeEntry.node.title 
+            //Append to animeList
+            animeList[animeId] = anime
+        }
+
+        //Set next URL or exit
+        if (data.paging.next == null) {
+            return {animeList: animeList}
+        } else {
+            console.log("")
+            nextURL = data.paging.next
+        }
+    }
 }
 
 //Export
