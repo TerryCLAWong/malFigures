@@ -84,14 +84,16 @@ CommonStaff.getCommonStudios = function(axios, accessToken) {
         console.log("Filtered score animelist\n", filteredAnimelist, "\n")
         //Appending animelist with studio names
         animeList = await appendStudioNames(filteredAnimelist, axios, authorization)
-        console.log("Animelist with studios\n", animeList)
+        console.log("Animelist with studios\n", animeList,"\n")
         //Generating common studios
+        studioMatches = getStudioMatches(animeList, req.body.commonAnimeCount)
+        console.log("Studio Matches\n", studioMatches)
 
         //Send generated data back to client
         console.log("all good") //todo - remove
         res.status(200)
         res.send({
-            "studioList" : "TODO - object containing lots of stuff about studios"
+            "studios" : studioMatches
         })
         
     } 
@@ -211,6 +213,7 @@ Appends studio name to each object mapped to by animeId
 */
 async function appendStudioNames(animeList, axios, authorization) {
     for (const animeId in animeList) {
+        console.log("getting studio name for animeid: ", animeId)
         //Get studio name
         result = await getStudios(animeId, axios, authorization)
         if (result.error != null) {
@@ -259,6 +262,29 @@ async function getStudios(animeId, axios, authorization) {
     )
     return result
 }
+
+function getStudioMatches(animeList, commonAnimeCount) {
+    studioMatches = {}
+    //Get matches
+    for (const animeId in animeList) {
+        //Iterate over studios
+        for (const studio in animeList[animeId].studios) {
+            studioName = animeList[animeId].studios[studio].name
+            if (studioMatches[studioName] == null) {
+                studioMatches[studioName] = 1
+            } else {
+                studioMatches[studioName]++
+            }
+        }
+    }
+    //Remove matches less than commonAnimeCount
+    for (const studio in studioMatches) {
+        if (studioMatches[studio] < commonAnimeCount) {
+            delete studioMatches[studio]
+        }
+    }
+    return studioMatches
+}   
 
 //Export
 module.exports = CommonStaff;
