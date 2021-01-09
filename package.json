@@ -4,13 +4,16 @@
   "description": "This is a web-app that looks at a given myanimelist.net user's anime list \r and analyses the listed shows within a given rating range and compiles a list of staff\r that have worked on those shows. The staff listed is determined by an integer input\r for the number of shows worked on for a given staff member.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js",
+    "start-watch": "nodemon index.js",
+    "dev": "concurrently \"yarn run start-watch\" \"cd client && yarn start\""
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/TerryCLAWong/malFigures.git"
   },
-  "author": "",
+  "author": "Terry Wong",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/TerryCLAWong/malFigures/issues"
@@ -21,6 +24,11 @@
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "express-validator": "^6.9.0",
-    "jsdoc": "^3.6.6"
+    "jsdoc": "^3.6.6",
+    "react-scripts": "^4.0.1"
+  },
+  "devDependencies": {
+    "concurrently": "^5.3.0",
+    "nodemon": "^2.0.7"
   }
 }
