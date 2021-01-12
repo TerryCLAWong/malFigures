@@ -26,7 +26,7 @@ CommonStaff.validate = (method) => {
                 }
                 throw new Error("Value must be an integer") 
             }),
-            body("commonAnimeCount").custom((value, { req }) => {
+            body("commonCount").custom((value, { req }) => {
                 if (value == undefined) {
                     throw new Error("Value is required")  
                 } else if (Number.isInteger(value)) {

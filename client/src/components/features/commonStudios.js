@@ -1,17 +1,12 @@
 import React, { Component }  from 'react';
 
 class commonStudios extends Component {
-
-
-
     state = {
         userName: "",
         upper: 0,
         lower: 0,
         commonStudioCount: 0
     }
-
-
 
     handleInputChange = (e) => {
         const target = e.target
@@ -22,9 +17,39 @@ class commonStudios extends Component {
         })
     }
 
+    validateTask = (task) => {
+        if (task.userName.length === 0 || task.upper.length === 0 || task.lower.length === 0 || task.commonCount.length === 0 ) {
+            return false
+        } else if (isNaN(task.upper) || isNaN(task.lower) || isNaN(task.commonCount)) {
+            return false
+        } else if (task.commonCount < 1) {
+            return false
+        }
+        return true
+    }
+
     getCommonStudios = (e) => {
         e.preventDefault(); //Prevents page/console reload
-        console.log(this.state)
+
+        const task = {
+            userName: this.state.userName,
+            upper: this.state.upper,
+            lower: this.state.lower,
+            commonCount: this.state.commonStudioCount
+        }
+
+        if (this.validateTask(task)) {
+            alert("Sending request.")
+            /*
+            Send request
+            then
+                update result section
+            catch
+                update result section
+            */
+        } else {
+            alert("Bad inputs, try again")
+        }
     }
     
     render () {
@@ -93,7 +118,7 @@ class commonStudios extends Component {
                     <input type="submit" value="Submit"/>
                 </form>
 
-
+                
                 <h2>HELLO</h2>
                 <p>Cras facilisis urna ornare ex volutpat, et
                 convallis erat elementum. Ut aliquam, ipsum vitae
