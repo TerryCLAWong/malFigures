@@ -15,7 +15,7 @@ router.get('/commonEmployees',
     MalInfo.commonStaff.getCommonEmployees(axios, accessToken)
 )
 
-router.get('/commonStudios',
+router.post('/commonStudios',
     MalInfo.commonStaff.validate('getCommonStudios'),
     MalInfo.commonStaff.getCommonStudios(axios, accessToken)
 )

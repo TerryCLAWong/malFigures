@@ -1,3 +1,4 @@
+import axios from 'axios';
 import React, { Component }  from 'react';
 
 class commonStudios extends Component {
@@ -5,7 +6,8 @@ class commonStudios extends Component {
         userName: "",
         upper: 0,
         lower: 0,
-        commonStudioCount: 0
+        commonStudioCount: 0,
+        client: this.props.client
     }
 
     handleInputChange = (e) => {
@@ -33,13 +35,29 @@ class commonStudios extends Component {
 
         const task = {
             userName: this.state.userName,
-            upper: this.state.upper,
-            lower: this.state.lower,
-            commonCount: this.state.commonStudioCount
+            upper: parseInt(this.state.upper),
+            lower: parseInt(this.state.lower),
+            commonCount: parseInt(this.state.commonStudioCount)
         }
 
         if (this.validateTask(task)) {
             alert("Sending request.")
+            console.log(task)
+            axios({
+                method: "post",
+                url : "http://localhost:5000/api/commonStudios",
+                data : task
+            })
+            .then(
+                (response) => {
+                    console.log(response)
+                }
+            )
+            .catch(
+                (error) => {
+                    console.log(error.response.data)
+                }
+            )
             /*
             Send request
             then
@@ -118,7 +136,7 @@ class commonStudios extends Component {
                     <input type="submit" value="Submit"/>
                 </form>
 
-                
+
                 <h2>HELLO</h2>
                 <p>Cras facilisis urna ornare ex volutpat, et
                 convallis erat elementum. Ut aliquam, ipsum vitae

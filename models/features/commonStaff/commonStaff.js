@@ -8,6 +8,7 @@ Validates request body parameters for CommonStaff
 const {body} = require('express-validator/check')
 CommonStaff.validate = (method) => {
     if (method == "getCommonEmployees" || method == "getCommonStudios") { //validation for both methods are the same
+        
         return [
             body("userName").custom((value, {req}) => {
                 if (typeof value == "string") {
@@ -69,10 +70,10 @@ CommonStaff.getCommonEmployees = function(axios, accessToken) {
 CommonStaff.getCommonStudios = function(axios, accessToken) {
     return async (req, res) => {
         console.log("Getting common anime studios")
+        console.log(req.body)
         //Handle Errors post validation
         ok = Errors.checkValidationErrors(req, res, validationResult)
         if (ok == false) {return}
-
         //Get Animelist
         result = await getAnimeList(req, axios, accessToken)
         if (result.error != null) {
@@ -86,16 +87,14 @@ CommonStaff.getCommonStudios = function(axios, accessToken) {
         animeList = await appendStudioNames(filteredAnimelist, axios, authorization)
         console.log("Animelist with studios\n", animeList,"\n")
         //Generating common studios
-        studioMatches = getStudioMatches(animeList, req.body.commonAnimeCount)
+        studioMatches = getStudioMatches(animeList, req.body.commonCount)
         console.log("Studio Matches\n", studioMatches)
-
         //Send generated data back to client
         console.log("all good") //todo - remove
         res.status(200)
         res.send({
             "studios" : studioMatches
         })
-        
     } 
 }
 
@@ -279,6 +278,7 @@ function getStudioMatches(animeList, commonAnimeCount) {
     }
     //Remove matches less than commonAnimeCount
     for (const studio in studioMatches) {
+        console.log("Comparing studio count", studioMatches[studio], commonAnimeCount)
         if (studioMatches[studio] < commonAnimeCount) {
             delete studioMatches[studio]
         }
