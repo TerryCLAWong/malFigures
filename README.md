@@ -2,31 +2,29 @@
 
 ## Purpose
 This is a web-app that looks at a given public myanimelist.net anime list and calculates/displays several interesting statistics and displays them in a data visualization. 
-
-
-#### Input
-* A url to a public MAL animelist
-* Integers for inclusive [low, high] range scores
-* Integer for shows worked on for a given staff member to be considered a "liked member".
-  
-#### Output
-* List of employees
-  * Role(s)
-  * Name
-  * MAL profile
-  * Number of relevant shows worked on
-
-* List of voice actors
-  * Name
-  * MAL profile
-  * Relevent characters portrayed
   
 ## Setup
 * have node.js installed
 * clone repo
-* install dependencies (listed below)
+* install dependencies (additional ones listed below)
+  * should only need to do `npm install concurrently` and `npm install react` which **should** take care of the other dependencies...
 * create .env file containing an `ACCESS_TOKEN` variable containing your MAL API access token. To generate one, follow the instructions here: https://myanimelist.net/blog.php?eid=835707
-* `node index.js`
+* `npm run dev`
+
+## Features
+* Common Studios
+  * From a given MAL user's animelist, get the names of the studios responsible for at least X # of anime within a given score range of the animelist
+
+## Planned Features
+* 'Trash Taste' Factor
+  * Looks at the completed anime of a given list and uses euclidean distance to determine how 'close' a user's anime scores are to the average found on MAL
+
+* User Similarity
+  * Similarly to the trash taste factor, scores between sets of anime are compared but instead of comparing a user to the average, a user is compared to another user.
+
+* Common Employees
+  * Similarly to common studios, this shows the employees and their respective roles behind the anime enjoyed by the user. 
+
 
 ## Dependencies 
 Note: All code instructions are assumed to be ran from root of repo
@@ -50,9 +48,6 @@ Note: All code instructions are assumed to be ran from root of repo
   * `npm install axios`
   * `cd client`
   * `npm install axios`
-  
-## Planned Dependencies
-* canvas.js for front-end data representation
 
 * nodemon
   * allows for the front-end client to update when changes are saved. this means that you don't need to manually restart and wait between changes
@@ -60,12 +55,17 @@ Note: All code instructions are assumed to be ran from root of repo
 
 * concurrently
   * allows for running commands simultaneously from one terminal
-  * `npm install concurrently`
+  * `npm install concurrently --save`
   
 * react-router-dom
   * helps for building single-page applications
   * `cd client`
   * `npm i react-router-dom --save`
+
+* nivo
+  * react library used for graphical data representation
+  * lots of neat examples on the [website](https://nivo.rocks/)
+  * `yarn add @nivo/core @nivo/bar`
   
 ## Design
 Note: Diagrams made with https://mermaid-js.github.io/mermaid/#/
