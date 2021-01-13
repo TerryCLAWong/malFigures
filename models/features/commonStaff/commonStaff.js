@@ -283,7 +283,18 @@ function getStudioMatches(animeList, commonAnimeCount) {
             delete studioMatches[studio]
         }
     }
-    return studioMatches
+
+    studioList = []
+    //Generate list of matches instead of map for data visualizer
+    for (const studio in studioMatches) {
+        studioEntry = {
+            studio : studio,
+            count: studioMatches[studio]
+        }
+        studioList.push(studioEntry)
+    }
+
+    return studioList
 }   
 
 //Export

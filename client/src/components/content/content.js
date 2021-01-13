@@ -1,7 +1,7 @@
 import React, { Component }  from 'react';
 import {Route} from "react-router-dom";
 //Features
-import commonStudios from "../features/commonStudios"
+import commonStudios from "../features/commonStudios/commonStudios"
 import Feature2 from "../features/feature2"
 
 
