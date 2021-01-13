@@ -285,6 +285,7 @@ function getStudioMatches(animeList, commonAnimeCount) {
     }
 
     studioList = []
+
     //Generate list of matches instead of map for data visualizer
     for (const studio in studioMatches) {
         studioEntry = {
@@ -293,6 +294,11 @@ function getStudioMatches(animeList, commonAnimeCount) {
         }
         studioList.push(studioEntry)
     }
+
+    //Sort from low to high count values
+    studioList.sort(function(a,b) {
+        return a.count - b.count
+    })
 
     return studioList
 }   
