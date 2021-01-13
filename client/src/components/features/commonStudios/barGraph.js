@@ -7,11 +7,31 @@ class barGraph extends Component {
         data : this.props.data
     }
 
+
+
+    /*
+    Data should have the format:
+    [
+        {
+            studio : 'trigger'
+            count : 14
+        }
+    ]
+    */
+    
     render () {
         return ( 
-            <ResponsiveBar
-            
-            />
+            <div>
+                <div style={{ height: "400px" }}>
+                    <ResponsiveBar
+                        data = {this.state.data}
+                        keys = {["count"]}
+                        indexBy = "studio"
+                    />
+                </div>
+            </div>
         )
     }
 }
+
+export default barGraph

@@ -8,6 +8,7 @@ class commonStudios extends Component {
         upper: 0,
         lower: 0,
         commonStudioCount: 0,
+        okResponse: false,
         studios : null
     }
 
@@ -33,6 +34,9 @@ class commonStudios extends Component {
 
     getCommonStudios = (e) => {
         e.preventDefault(); //Prevents page/console reload
+        this.setState({
+            okResponse : false
+        })
 
         const task = {
             userName: this.state.userName,
@@ -52,20 +56,15 @@ class commonStudios extends Component {
             .then(
                 (response) => {
                     this.setState({
-                        studios : response.data.studios
+                        studios : response.data.studios,
+                        okResponse : true
                     })
-                    console.log(this.state)
-
-                    //contentDiv = document.getElementsByClassName("output");
-                    //barGraph = <BarGraph data = {this.state.studios}/>
-                    //contentDiv.appendChild(barGraph)
-                    //Change format of data returned from the back end
-                    //Add <BarGraph data = {this.state.studios}/> to the div with className = output
+                    console.log(this.state) //todo remove test print
                 }
             )
             .catch(
                 (error) => {
-                    console.log(error.response.data)
+                    console.log(error.response.message)
                 }
             )
         } else {
@@ -75,7 +74,7 @@ class commonStudios extends Component {
     
     render () {
         return (
-            <div>
+            <div className = "feature">
                 <div className = "input">
                     <form onSubmit={this.getCommonStudios}>
                         <label>
@@ -126,9 +125,13 @@ class commonStudios extends Component {
                         <input type="submit" value="Submit"/>
                     </form>
                 </div>
-
+                
                 <div className = "output">
-                    
+                    {                        
+                        //Only display on ok response from backend
+                        this.state.okResponse &&
+                            <BarGraph data = {this.state.studios}/>
+                    }
                 </div>
             </div>
         )
