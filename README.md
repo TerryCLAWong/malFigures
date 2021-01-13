@@ -20,6 +20,13 @@ This is a web-app that looks at a given public myanimelist.net anime list and ca
   * Name
   * MAL profile
   * Relevent characters portrayed
+  
+## Setup
+* have node.js installed
+* clone repo
+* install dependencies (listed below)
+* create .env file containing an `ACCESS_TOKEN` variable containing your MAL API access token. To generate one, follow the instructions here: https://myanimelist.net/blog.php?eid=835707
+* `node index.js`
 
 ## Dependencies 
 Note: All code instructions are assumed to be ran from root of repo
@@ -43,6 +50,9 @@ Note: All code instructions are assumed to be ran from root of repo
   * `npm install axios`
   * `cd client`
   * `npm install axios`
+  
+## Planned Dependencies
+* canvas.js for front-end data representation
 
 * nodemon
   * allows for the front-end client to update when changes are saved. this means that you don't need to manually restart and wait between changes
