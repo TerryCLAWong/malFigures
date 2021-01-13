@@ -24,9 +24,24 @@ class barGraph extends Component {
             <div>
                 <div style={{ height: "400px" }}>
                     <ResponsiveBar
+                        margin={{ top: 50, right: 80, bottom: 50, left: 100 }}
                         data = {this.state.data}
                         keys = {["count"]}
                         indexBy = "studio"
+                        axisLeft = {
+                            {
+                                legend: "Animes Produced",
+                                legendPosition: 'middle',
+                                legendOffset: -50,
+                            }
+                        }
+                        axisBottom = {
+                            {
+                                legend: "Studio",
+                                legendPosition: 'middle',
+                                legendOffset: 40,
+                            }
+                        }
                     />
                 </div>
             </div>
