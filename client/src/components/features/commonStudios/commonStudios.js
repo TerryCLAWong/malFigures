@@ -13,7 +13,8 @@ class commonStudios extends Component {
         studios : null,
 
         upperOptions : [],
-        lowerOptions : []
+        lowerOptions : [],
+        commonStudioCountOptions: [],
     }
 
     componentDidMount() {
@@ -51,6 +52,19 @@ class commonStudios extends Component {
         }
         this.setState({
             lowerOptions: options,
+        })
+        //Studio count options
+        options = []
+        for (i = 1; i <= 20; i++) {
+            option = {
+                value: i,
+                label: i,
+                stateAssociation: "commonStudioCount"
+            }
+            options.push(option)
+        }
+        this.setState({
+            commonStudioCountOptions: options,
         })
     }
 
@@ -115,7 +129,7 @@ class commonStudios extends Component {
         }
     }
 
-    handleUpperLowerChange = (option) => {
+    handleSelectChange = (option) => {
         var options = []
         var i
         if (option.stateAssociation === "upper") {
@@ -132,7 +146,7 @@ class commonStudios extends Component {
                 lowerOptions: options,
                 upper: option.value
             })
-        } else {
+        } else if (option.stateAssociation === "lower") {
             //Change possible 'upper' values [lower,10]
             for (i = option.value; i <= 10; i++) {
                 const newOption = {
@@ -145,6 +159,10 @@ class commonStudios extends Component {
             this.setState({
                 upperOptions: options,
                 lower: option.value
+            })
+        } else if (option.stateAssociation === "commonStudioCount") {
+            this.setState({
+                commonStudioCount: option.value
             })
         }
     }
@@ -167,45 +185,29 @@ class commonStudios extends Component {
                         <br/>
                         
                         <label>
-                            Upper
+                            Upper:
                             <Select
-                                onChange = {this.handleUpperLowerChange}
+                                onChange = {this.handleSelectChange}
                                 options = {this.state.upperOptions}
                             />
                         </label>
                         <label>
-                            Lower
+                            Lower:
                             <Select
-                                onChange = {this.handleUpperLowerChange}
+                                onChange = {this.handleSelectChange}
                                 options = {this.state.lowerOptions}
                             />
                         </label>
-                        
-
-                        
-                        <br/>
                         <label>
                             Common Studio Count:
-                            <input
-                                name = "commonStudioCount"
-                                type = "number"
-                                value = {this.state.commonStudioCount}
-                                onChange = {this.handleInputChange}
-                                min = "1"
-                            /> 
+                            <Select
+                                onChange = {this.handleSelectChange}
+                                options = {this.state.commonStudioCountOptions}
+                            />
                         </label>
                         <br/>
-            
-                        
-
-
-
                         <input type="submit" value="Submit"/>
                     </form>
-
-                    <button>
-                        Test
-                    </button>
                 </div>
                 
                 <div className = "output">
