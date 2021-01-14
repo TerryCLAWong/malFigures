@@ -264,6 +264,8 @@ async function getStudios(animeId, axios, authorization) {
 
 function getStudioMatches(animeList, commonAnimeCount) {
     studioMatches = {}
+    studioList = []
+
     //Get matches
     for (const animeId in animeList) {
         //Iterate over studios
@@ -276,6 +278,7 @@ function getStudioMatches(animeList, commonAnimeCount) {
             }
         }
     }
+
     //Remove matches less than commonAnimeCount
     for (const studio in studioMatches) {
         console.log("Comparing studio count", studioMatches[studio], commonAnimeCount)
@@ -283,8 +286,6 @@ function getStudioMatches(animeList, commonAnimeCount) {
             delete studioMatches[studio]
         }
     }
-
-    studioList = []
 
     //Generate list of matches instead of map for data visualizer
     for (const studio in studioMatches) {
@@ -294,7 +295,7 @@ function getStudioMatches(animeList, commonAnimeCount) {
         }
         studioList.push(studioEntry)
     }
-
+    
     //Sort from low to high count values
     studioList.sort(function(a,b) {
         return a.count - b.count

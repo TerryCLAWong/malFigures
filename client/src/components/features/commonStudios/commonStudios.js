@@ -1,6 +1,7 @@
 import axios from 'axios'
 import React, { Component }  from 'react'
 import BarGraph from './barGraph'
+import Select from 'react-select';
 
 class commonStudios extends Component {
     state = {
@@ -9,7 +10,48 @@ class commonStudios extends Component {
         lower: 0,
         commonStudioCount: 0,
         okResponse: false,
-        studios : null
+        studios : null,
+
+        upperOptions : [],
+        lowerOptions : []
+    }
+
+    componentDidMount() {
+        //Set up for upper/lower
+        this.optionsSetup()
+        
+    }
+
+    optionsSetup = () => {
+        var options = []
+        var i
+        var option
+        
+        //Upper options
+        for (i = 1; i <= 10; i++) {
+            option = {
+                value: i,
+                label: i,
+                stateAssociation: "upper"
+            }
+            options.push(option)
+        }
+        this.setState({
+            upperOptions: options,
+        })
+        //Lower options
+        options = []
+        for (i = 1; i <= 10; i++) {
+            option = {
+                value: i,
+                label: i,
+                stateAssociation: "lower"
+            }
+            options.push(option)
+        }
+        this.setState({
+            lowerOptions: options,
+        })
     }
 
     handleInputChange = (e) => {
@@ -20,6 +62,7 @@ class commonStudios extends Component {
             [name]: value //[] is the value of the variable
         })
     }
+    
 
     validateTask = (task) => {
         if (task.userName.length === 0 || task.upper.length === 0 || task.lower.length === 0 || task.commonCount.length === 0 ) {
@@ -71,6 +114,40 @@ class commonStudios extends Component {
             alert("Bad inputs, try again")
         }
     }
+
+    handleUpperLowerChange = (option) => {
+        var options = []
+        var i
+        if (option.stateAssociation === "upper") {
+            //Change possible 'lower' values [1,upper]
+            for (i = 1; i <= option.value; i++) {
+                const newOption = {
+                    value: i,
+                    label: i,
+                    stateAssociation: "lower"
+                }
+                options.push(newOption)
+            }
+            this.setState({
+                lowerOptions: options,
+                upper: option.value
+            })
+        } else {
+            //Change possible 'upper' values [lower,10]
+            for (i = option.value; i <= 10; i++) {
+                const newOption = {
+                    value: i,
+                    label: i,
+                    stateAssociation: "upper"
+                }
+                options.push(newOption)
+            }
+            this.setState({
+                upperOptions: options,
+                lower: option.value
+            })
+        }
+    }
     
     render () {
         return (
@@ -79,6 +156,7 @@ class commonStudios extends Component {
                     <form onSubmit={this.getCommonStudios}>
                         <label>
                             MyAnimeList Username:
+                            <br/>
                             <input
                                 name = "userName"
                                 type = "text"
@@ -87,29 +165,24 @@ class commonStudios extends Component {
                             /> 
                         </label>
                         <br/>
+                        
                         <label>
-                            Upper Score:
-                            <input
-                                name = "upper"
-                                type = "number"
-                                value = {this.state.upper}
-                                onChange = {this.handleInputChange}
-                                min = "0"
-                                max = "10"
-                            /> 
+                            Upper
+                            <Select
+                                onChange = {this.handleUpperLowerChange}
+                                options = {this.state.upperOptions}
+                            />
                         </label>
-                        <br/>
                         <label>
-                            Lower Score:
-                            <input
-                                name = "lower"
-                                type = "number"
-                                value = {this.state.lower}
-                                onChange = {this.handleInputChange}
-                                min = "0"
-                                max = "10"
-                            /> 
+                            Lower
+                            <Select
+                                onChange = {this.handleUpperLowerChange}
+                                options = {this.state.lowerOptions}
+                            />
                         </label>
+                        
+
+                        
                         <br/>
                         <label>
                             Common Studio Count:
@@ -122,8 +195,17 @@ class commonStudios extends Component {
                             /> 
                         </label>
                         <br/>
+            
+                        
+
+
+
                         <input type="submit" value="Submit"/>
                     </form>
+
+                    <button>
+                        Test
+                    </button>
                 </div>
                 
                 <div className = "output">
