@@ -5,13 +5,19 @@ import Select from 'react-select';
 
 class commonStudios extends Component {
     state = {
+        //Input
         userName: "",
         upper: 0,
         lower: 0,
         commonStudioCount: 0,
-        okResponse: false,
+        //Output
         studios : null,
-
+        //Errors
+        okResponse: false,
+        userDNE: false,
+        tokenError: false,
+        disconnected: false,
+        //Select Options
         upperOptions : [],
         lowerOptions : [],
         commonStudioCountOptions: [],
@@ -92,7 +98,10 @@ class commonStudios extends Component {
     getCommonStudios = (e) => {
         e.preventDefault(); //Prevents page/console reload
         this.setState({
-            okResponse : false
+            userDNE: false,
+            okResponse : false,
+            tokenError: false,
+            disconnected: false
         })
 
         const task = {
@@ -121,7 +130,24 @@ class commonStudios extends Component {
             )
             .catch(
                 (error) => {
-                    console.log(error.response.message)
+                    console.log(error.message)
+                    if (error.message === "Network Error") { 
+                        this.setState({
+                            disconnected: true
+                        })
+                    } else {
+                        let errorMessage = error.response.data.MAL_API_Error
+                        if (errorMessage === "not_found") {
+                            this.setState({
+                                userDNE: true
+                            })
+                        } else if (errorMessage === "invalid_token") {
+                            this.setState({
+                                tokenError: true
+                            })
+                        }
+                        //todo more cases
+                    }
                 }
             )
         } else {
@@ -166,8 +192,21 @@ class commonStudios extends Component {
             })
         }
     }
+
+    renderError = () => {
+        if (this.state.userDNE) {
+            return <p>The user: {this.state.userName}, is not an existing myanimelist.net account</p>
+        } else if (this.state.tokenError) {
+            return <p>Backend Token Issue, Sorry!!!</p>
+        } else if (this.state.disconnected) {
+            return <p>Server is not responding....   oh shit.</p>
+        }
+    }
     
     render () {
+
+
+
         return (
             <div className = "feature">
                 <div className = "input">
@@ -211,15 +250,20 @@ class commonStudios extends Component {
                 </div>
                 
                 <div className = "output">
-                    {                        
+                {                    
                         //Only display on ok response from backend
                         this.state.okResponse &&
                             <BarGraph data = {this.state.studios}/>
+                        
                     }
+                    {this.renderError()}
                 </div>
             </div>
         )
     }
+
+    
+
 }
 
 export default commonStudios

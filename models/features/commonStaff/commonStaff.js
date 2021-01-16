@@ -77,8 +77,11 @@ CommonStaff.getCommonStudios = function(axios, accessToken) {
         //Get Animelist
         result = await getAnimeList(req, axios, accessToken)
         if (result.error != null) {
+            //Animelist GET for the user failed
             res.status(502)
             res.send(result.error)
+            return
+           // console.log("AAASASAASA" + result.error)
         }
 
         //Remove anime out of score range
@@ -96,6 +99,7 @@ CommonStaff.getCommonStudios = function(axios, accessToken) {
         res.send({
             "studios" : studioCounts
         })
+        return
     } 
 }
 
@@ -128,7 +132,7 @@ async function getAnimeList(req, axios, accessToken) {
     ).catch(
         (error) => {
             console.log("Failed GET animelist: " + req.body.userName) //todo remove
-            MALAPIError = {"MAL API Error": error.response.data.error}
+            MALAPIError = {"MAL_API_Error": error.response.data.error}
             return {error: MALAPIError, data: null}
         }
     )
