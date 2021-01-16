@@ -87,7 +87,7 @@ CommonStaff.getCommonStudios = function(axios, accessToken) {
         console.log("Animelist with score filtering: \n", filteredAnimelist, "\n")
 
         //Generating common studios
-        studioCounts = getStudioCounts(animeList, req.body.commonCount)
+        studioCounts = getStudioCounts(filteredAnimelist, req.body.commonCount)
         console.log("Studio Counts:\n", studioCounts)
 
         //Send generated data back to client
@@ -189,7 +189,6 @@ async function getAnimePages(data, axios) {
         if (data.paging.next == null) {
             return {animeList: animeList}
         } else {
-            console.log("")
             nextURL = data.paging.next
         }
     }
@@ -217,17 +216,22 @@ function getStudioCounts(animeList, commonAnimeCount) {
         //Iterate over studios
         for (const studio in animeList[animeId].studios) {
             studioName = animeList[animeId].studios[studio].name
+            studioId = animeList[animeId].studios[studio].id
             if (studioCounts[studioName] == null) {
-                studioCounts[studioName] = 1
+                studioEntry = {
+                    count: 1,
+                    id: studioId
+                }
+                studioCounts[studioName] = studioEntry
             } else {
-                studioCounts[studioName]++
+                studioCounts[studioName].count++
             }
         }
     }
 
     //Remove counts less than commonAnimeCount
     for (const studio in studioCounts) {
-        if (studioCounts[studio] < commonAnimeCount) {
+        if (studioCounts[studio].count < commonAnimeCount) {
             delete studioCounts[studio]
         }
     }
@@ -236,7 +240,8 @@ function getStudioCounts(animeList, commonAnimeCount) {
     for (const studio in studioCounts) {
         studioEntry = {
             studio : studio,
-            count: studioCounts[studio]
+            count: studioCounts[studio].count,
+            id: studioCounts[studio].id
         }
         studioList.push(studioEntry)
     }
