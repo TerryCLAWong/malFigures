@@ -77,24 +77,29 @@ CommonStaff.getCommonStudios = function(axios, accessToken) {
         //Get Animelist
         result = await getAnimeList(req, axios, accessToken)
         if (result.error != null) {
+            //Animelist GET for the user failed
             res.status(502)
             res.send(result.error)
+            return
+           // console.log("AAASASAASA" + result.error)
         }
+
         //Remove anime out of score range
         filteredAnimelist = removeScoreOutofRange(result.animeList, req.body.upper, req.body.lower)
-        console.log("Filtered score animelist\n", filteredAnimelist, "\n")
-        //Appending animelist with studio names
-        animeList = await appendStudioNames(filteredAnimelist, axios, authorization)
-        console.log("Animelist with studios\n", animeList,"\n")
+        console.log("Score filtering complete")
+        console.log("Animelist with score filtering: \n", filteredAnimelist, "\n")
+
         //Generating common studios
-        studioMatches = getStudioMatches(animeList, req.body.commonCount)
-        console.log("Studio Matches\n", studioMatches)
+        studioCounts = getStudioCounts(filteredAnimelist, req.body.commonCount)
+        console.log("Studio Counts:\n", studioCounts)
+
         //Send generated data back to client
         console.log("all good") //todo - remove
         res.status(200)
         res.send({
-            "studios" : studioMatches
+            "studios" : studioCounts
         })
+        return
     } 
 }
 
@@ -104,7 +109,7 @@ async function getAnimeList(req, axios, accessToken) {
         method: "get",
         url: "https://api.myanimelist.net/v2/users/" + req.body.userName + "/animelist?",
         params: {
-            "fields" : "list_status",
+            "fields" : "list_status,studios",
             "limit" : 1000, //limit max to maximize speed
         },
         headers: {
@@ -127,7 +132,7 @@ async function getAnimeList(req, axios, accessToken) {
     ).catch(
         (error) => {
             console.log("Failed GET animelist: " + req.body.userName) //todo remove
-            MALAPIError = {"MAL API Error": error.response.data.error}
+            MALAPIError = {"MAL_API_Error": error.response.data.error}
             return {error: MALAPIError, data: null}
         }
     )
@@ -179,6 +184,7 @@ async function getAnimePages(data, axios) {
             anime = {}
             anime.score = animeEntry.list_status.score
             anime.title = animeEntry.node.title 
+            anime.studios = animeEntry.node.studios
             //Append to animeList
             animeList[animeId] = anime
         }
@@ -187,7 +193,6 @@ async function getAnimePages(data, axios) {
         if (data.paging.next == null) {
             return {animeList: animeList}
         } else {
-            console.log("")
             nextURL = data.paging.next
         }
     }
@@ -203,96 +208,52 @@ function removeScoreOutofRange(animeList, upper, lower) {
             delete animeList[animeId]
         }
     }
-    console.log("Filtered scores")
     return animeList
 }
 
-/*
-Appends studio name to each object mapped to by animeId
-*/
-async function appendStudioNames(animeList, axios, authorization) {
-    for (const animeId in animeList) {
-        console.log("getting studio name for animeid: ", animeId)
-        //Get studio name
-        result = await getStudios(animeId, axios, authorization)
-        if (result.error != null) {
-            console.log("Failed to get studio for: ", animeList[animeId])
-            console.log("Error: " + result.error)
-            continue
-        } 
-        //Add studio name to object
-        animeList[animeId].studios = result.studios
-    }
-    console.log("Gotten studio names")
-    return animeList
-}
+function getStudioCounts(animeList, commonAnimeCount) {
+    studioCounts = {}
+    studioList = []
 
-/*
-Return object:
-{
-    error: <error string from mal api response>
-    studios: <array of anime studios>
-}
-*/
-async function getStudios(animeId, axios, authorization) {
-    result = await axios({   
-        method: "get",
-        url: "https://api.myanimelist.net/v2/anime/" + animeId,
-        params: {
-            "fields" : "studios"
-        },
-        headers: {
-            "Authorization" : authorization
-        }
-    }).then(
-        (response) => {
-            return {
-                error: null,
-                studios: response.data.studios
-            }
-        }
-    ).catch(
-        (error) => {
-            return {
-                error: error.response.data.error,
-                studios: null
-            }
-        }
-    )
-    return result
-}
-
-function getStudioMatches(animeList, commonAnimeCount) {
-    studioMatches = {}
     //Get matches
     for (const animeId in animeList) {
         //Iterate over studios
         for (const studio in animeList[animeId].studios) {
             studioName = animeList[animeId].studios[studio].name
-            if (studioMatches[studioName] == null) {
-                studioMatches[studioName] = 1
+            studioId = animeList[animeId].studios[studio].id
+            if (studioCounts[studioName] == null) {
+                studioEntry = {
+                    count: 1,
+                    id: studioId
+                }
+                studioCounts[studioName] = studioEntry
             } else {
-                studioMatches[studioName]++
+                studioCounts[studioName].count++
             }
         }
     }
-    //Remove matches less than commonAnimeCount
-    for (const studio in studioMatches) {
-        console.log("Comparing studio count", studioMatches[studio], commonAnimeCount)
-        if (studioMatches[studio] < commonAnimeCount) {
-            delete studioMatches[studio]
+
+    //Remove counts less than commonAnimeCount
+    for (const studio in studioCounts) {
+        if (studioCounts[studio].count < commonAnimeCount) {
+            delete studioCounts[studio]
         }
     }
 
-    studioList = []
     //Generate list of matches instead of map for data visualizer
-    for (const studio in studioMatches) {
+    for (const studio in studioCounts) {
         studioEntry = {
             studio : studio,
-            count: studioMatches[studio]
+            count: studioCounts[studio].count,
+            id: studioCounts[studio].id
         }
         studioList.push(studioEntry)
     }
+    
+    //Sort from low to high count values
+    studioList.sort(function(a,b) {
+        return a.count - b.count
+    })
 
     return studioList
 }   

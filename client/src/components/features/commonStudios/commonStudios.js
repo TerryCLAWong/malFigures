@@ -1,15 +1,77 @@
 import axios from 'axios'
 import React, { Component }  from 'react'
 import BarGraph from './barGraph'
+import Select from 'react-select';
 
 class commonStudios extends Component {
     state = {
+        //Input
         userName: "",
         upper: 0,
         lower: 0,
         commonStudioCount: 0,
+        //Output
+        studios : null,
+        //Errors
         okResponse: false,
-        studios : null
+        userDNE: false,
+        tokenError: false,
+        disconnected: false,
+        //Select Options
+        upperOptions : [],
+        lowerOptions : [],
+        commonStudioCountOptions: [],
+    }
+
+    componentDidMount() {
+        //Set up for upper/lower
+        this.optionsSetup()
+        
+    }
+
+    optionsSetup = () => {
+        var options = []
+        var i
+        var option
+        
+        //Upper options
+        for (i = 1; i <= 10; i++) {
+            option = {
+                value: i,
+                label: i,
+                stateAssociation: "upper"
+            }
+            options.push(option)
+        }
+        this.setState({
+            upperOptions: options,
+        })
+        //Lower options
+        options = []
+        for (i = 1; i <= 10; i++) {
+            option = {
+                value: i,
+                label: i,
+                stateAssociation: "lower"
+            }
+            options.push(option)
+        }
+        this.setState({
+            lowerOptions: options,
+        })
+        //Studio count options
+        options = []
+        for (i = 1; i <= 20; i++) {
+            option = {
+                value: i,
+                label: i,
+                stateAssociation: "commonStudioCount"
+            }
+            options.push(option)
+        }
+        this.setState({
+            commonStudioCountOptions: options,
+        })
     }
 
     handleInputChange = (e) => {
@@ -20,6 +82,7 @@ class commonStudios extends Component {
             [name]: value //[] is the value of the variable
         })
     }
+    
 
     validateTask = (task) => {
         if (task.userName.length === 0 || task.upper.length === 0 || task.lower.length === 0 || task.commonCount.length === 0 ) {
@@ -35,7 +98,10 @@ class commonStudios extends Component {
     getCommonStudios = (e) => {
         e.preventDefault(); //Prevents page/console reload
         this.setState({
-            okResponse : false
+            userDNE: false,
+            okResponse : false,
+            tokenError: false,
+            disconnected: false
         })
 
         const task = {
@@ -64,21 +130,90 @@ class commonStudios extends Component {
             )
             .catch(
                 (error) => {
-                    console.log(error.response.message)
+                    console.log(error.message)
+                    if (error.message === "Network Error") { 
+                        this.setState({
+                            disconnected: true
+                        })
+                    } else {
+                        let errorMessage = error.response.data.MAL_API_Error
+                        if (errorMessage === "not_found") {
+                            this.setState({
+                                userDNE: true
+                            })
+                        } else if (errorMessage === "invalid_token") {
+                            this.setState({
+                                tokenError: true
+                            })
+                        }
+                        //todo more cases
+                    }
                 }
             )
         } else {
             alert("Bad inputs, try again")
         }
     }
+
+    handleSelectChange = (option) => {
+        var options = []
+        var i
+        if (option.stateAssociation === "upper") {
+            //Change possible 'lower' values [1,upper]
+            for (i = 1; i <= option.value; i++) {
+                const newOption = {
+                    value: i,
+                    label: i,
+                    stateAssociation: "lower"
+                }
+                options.push(newOption)
+            }
+            this.setState({
+                lowerOptions: options,
+                upper: option.value
+            })
+        } else if (option.stateAssociation === "lower") {
+            //Change possible 'upper' values [lower,10]
+            for (i = option.value; i <= 10; i++) {
+                const newOption = {
+                    value: i,
+                    label: i,
+                    stateAssociation: "upper"
+                }
+                options.push(newOption)
+            }
+            this.setState({
+                upperOptions: options,
+                lower: option.value
+            })
+        } else if (option.stateAssociation === "commonStudioCount") {
+            this.setState({
+                commonStudioCount: option.value
+            })
+        }
+    }
+
+    renderError = () => {
+        if (this.state.userDNE) {
+            return <p>The user: {this.state.userName}, is not an existing myanimelist.net account</p>
+        } else if (this.state.tokenError) {
+            return <p>Backend Token Issue, Sorry!!!</p>
+        } else if (this.state.disconnected) {
+            return <p>Server is not responding....   oh shit.</p>
+        }
+    }
     
     render () {
+
+
+
         return (
             <div className = "feature">
                 <div className = "input">
                     <form onSubmit={this.getCommonStudios}>
                         <label>
                             MyAnimeList Username:
+                            <br/>
                             <input
                                 name = "userName"
                                 type = "text"
@@ -87,39 +222,27 @@ class commonStudios extends Component {
                             /> 
                         </label>
                         <br/>
+                        
                         <label>
-                            Upper Score:
-                            <input
-                                name = "upper"
-                                type = "number"
-                                value = {this.state.upper}
-                                onChange = {this.handleInputChange}
-                                min = "0"
-                                max = "10"
-                            /> 
+                            Upper:
+                            <Select
+                                onChange = {this.handleSelectChange}
+                                options = {this.state.upperOptions}
+                            />
                         </label>
-                        <br/>
                         <label>
-                            Lower Score:
-                            <input
-                                name = "lower"
-                                type = "number"
-                                value = {this.state.lower}
-                                onChange = {this.handleInputChange}
-                                min = "0"
-                                max = "10"
-                            /> 
+                            Lower:
+                            <Select
+                                onChange = {this.handleSelectChange}
+                                options = {this.state.lowerOptions}
+                            />
                         </label>
-                        <br/>
                         <label>
                             Common Studio Count:
-                            <input
-                                name = "commonStudioCount"
-                                type = "number"
-                                value = {this.state.commonStudioCount}
-                                onChange = {this.handleInputChange}
-                                min = "1"
-                            /> 
+                            <Select
+                                onChange = {this.handleSelectChange}
+                                options = {this.state.commonStudioCountOptions}
+                            />
                         </label>
                         <br/>
                         <input type="submit" value="Submit"/>
@@ -127,15 +250,20 @@ class commonStudios extends Component {
                 </div>
                 
                 <div className = "output">
-                    {                        
+                {                    
                         //Only display on ok response from backend
                         this.state.okResponse &&
                             <BarGraph data = {this.state.studios}/>
+                        
                     }
+                    {this.renderError()}
                 </div>
             </div>
         )
     }
+
+    
+
 }
 
 export default commonStudios

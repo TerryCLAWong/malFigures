@@ -18,13 +18,17 @@ class barGraph extends Component {
         }
     ]
     */
-    
+    visitMALStudioPage  = (e) => {
+        let url = "https://myanimelist.net/anime/producer/" + e.data.id.toString()
+        window.open(url, '_blank').focus()
+    }
+
     render () {
         return ( 
             <div>
-                <div style={{ height: "400px" }}>
+                <div style={{height: "400px"}}>
                     <ResponsiveBar
-                        margin={{ top: 50, right: 80, bottom: 50, left: 100 }}
+                        margin={{ top: 50, right: 80, bottom: 100, left: 100 }}
                         data = {this.state.data}
                         keys = {["count"]}
                         indexBy = "studio"
@@ -37,11 +41,14 @@ class barGraph extends Component {
                         }
                         axisBottom = {
                             {
-                                legend: "Studio",
+                                legend: "Anime Studio",
                                 legendPosition: 'middle',
-                                legendOffset: 40,
+                                legendOffset: 50,
+                                tickRotation: 14,
                             }
                         }
+                        animate = {true}
+                        onClick = {this.visitMALStudioPage}
                     />
                 </div>
             </div>
