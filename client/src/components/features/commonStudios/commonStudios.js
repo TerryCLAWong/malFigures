@@ -21,6 +21,8 @@ class commonStudios extends Component {
         upperOptions : [],
         lowerOptions : [],
         commonStudioCountOptions: [],
+        //Bargraph colors
+
     }
 
     componentDidMount() {
@@ -112,7 +114,7 @@ class commonStudios extends Component {
         }
 
         if (this.validateTask(task)) {
-            console.log("Sending request.")
+            console.log("Sending request body:")
             console.log(task)
             axios({
                 method: "post",
@@ -125,7 +127,6 @@ class commonStudios extends Component {
                         studios : response.data.studios,
                         okResponse : true
                     })
-                    console.log(this.state) //todo remove test print
                 }
             )
             .catch(
@@ -253,7 +254,11 @@ class commonStudios extends Component {
                 {                    
                         //Only display on ok response from backend
                         this.state.okResponse &&
-                            <BarGraph data = {this.state.studios}/>
+                            <BarGraph 
+                                data = {this.state.studios}
+                                barColor = "hsl(214, 99%, 78%)"
+                                highlightColor = "hsl(214, 99%, 58%)"
+                            />
                         
                     }
                     {this.renderError()}

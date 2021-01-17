@@ -4,24 +4,47 @@ import React, { Component } from 'react';
 class barGraph extends Component {
     //Prob don't need a state to store the props.data again since state is supposed to be dynamic
     state = {
-        data : this.props.data
+        data : this.props.data,
+        barColor: this.props.barColor,
+        highlightColor : this.props.highlightColor
     }
 
+    componentDidMount() {
+        const dataCopy = Array.from(this.state.data)
+        console.log(this.state)
+        //add state.barColor to all of the data
+        dataCopy.map(
+            entry => entry.color = this.state.barColor
+        )
+        this.setState({
+            data : dataCopy
+        })
+    }
 
-
-    /*
-    Data should have the format:
-    [
-        {
-            studio : 'trigger'
-            count : 14
-        }
-    ]
-    */
     visitMALStudioPage  = (e) => {
         let url = "https://myanimelist.net/anime/producer/" + e.data.id.toString()
         window.open(url, '_blank').focus()
     }
+
+
+    //Todo, figure out how to pass params into callback functions
+    
+    highlightBar = (data) => {
+        this.changeBarColor(data.index, this.state.highlightColor)
+    }
+
+    revertBarColor = (data) => {
+        this.changeBarColor(data.index, this.state.barColor)
+    }
+
+    changeBarColor = (index, color) => {
+        const dataCopy = [...this.state.data]
+        dataCopy[index].color = color
+        this.setState({
+            data: dataCopy
+        })
+    }
+    
 
     render () {
         return ( 
@@ -32,6 +55,8 @@ class barGraph extends Component {
                         data = {this.state.data}
                         keys = {["count"]}
                         indexBy = "studio"
+                        colorBy = "index"
+                        colors = {this.state.data.map(c => c.color)}
                         axisLeft = {
                             {
                                 legend: "Animes Produced",
@@ -49,6 +74,12 @@ class barGraph extends Component {
                         }
                         animate = {true}
                         onClick = {this.visitMALStudioPage}
+                        onMouseEnter={
+                            this.highlightBar
+                        }
+                        onMouseLeave={
+                            this.revertBarColor
+                        }
                     />
                 </div>
             </div>
