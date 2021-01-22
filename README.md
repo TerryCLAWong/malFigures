@@ -11,7 +11,7 @@ This is a web-app that looks at a given public myanimelist.net anime list and ca
 * create .env file containing an `ACCESS_TOKEN` variable containing your MAL API access token. To generate one, follow the instructions here: https://myanimelist.net/blog.php?eid=835707
 * `npm run dev`
 
-## Features
+## Completed Features
 * Common Studios
   * From a given MAL user's animelist, get the names of the studios responsible for at least X # of anime within a given score range of the animelist
 
