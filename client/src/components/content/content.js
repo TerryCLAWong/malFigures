@@ -8,7 +8,7 @@ import Feature2 from "../features/feature2"
 class Content extends Component {
     render () {
         return (
-            <div className = "content">
+            <div>
                 <Route path="/commonStudios" component={commonStudios}/>
                 <Route path="/f2" component={Feature2}/>
             </div>

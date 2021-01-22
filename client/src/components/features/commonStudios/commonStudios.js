@@ -53,8 +53,6 @@ class commonStudios extends Component {
         for (i = 1; i <= 10; i++) {
             option = {
                 value: i,
-                label: i,
-                stateAssociation: "lower"
             }
             options.push(option)
         }
@@ -66,8 +64,6 @@ class commonStudios extends Component {
         for (i = 1; i <= 20; i++) {
             option = {
                 value: i,
-                label: i,
-                stateAssociation: "commonStudioCount"
             }
             options.push(option)
         }
@@ -113,6 +109,8 @@ class commonStudios extends Component {
             commonCount: parseInt(this.state.commonStudioCount)
         }
 
+        console.log(this.state, task)
+
         if (this.validateTask(task)) {
             console.log("Sending request body:")
             console.log(task)
@@ -156,44 +154,6 @@ class commonStudios extends Component {
         }
     }
 
-    handleSelectChange = (option) => {
-        var options = []
-        var i
-        if (option.stateAssociation === "upper") {
-            //Change possible 'lower' values [1,upper]
-            for (i = 1; i <= option.value; i++) {
-                const newOption = {
-                    value: i,
-                    label: i,
-                    stateAssociation: "lower"
-                }
-                options.push(newOption)
-            }
-            this.setState({
-                lowerOptions: options,
-                upper: option.value
-            })
-        } else if (option.stateAssociation === "lower") {
-            //Change possible 'upper' values [lower,10]
-            for (i = option.value; i <= 10; i++) {
-                const newOption = {
-                    value: i,
-                    label: i,
-                    stateAssociation: "upper"
-                }
-                options.push(newOption)
-            }
-            this.setState({
-                upperOptions: options,
-                lower: option.value
-            })
-        } else if (option.stateAssociation === "commonStudioCount") {
-            this.setState({
-                commonStudioCount: option.value
-            })
-        }
-    }
-
     renderError = () => {
         if (this.state.userDNE) {
             return <p>The user: {this.state.userName}, is not an existing myanimelist.net account</p>
@@ -203,66 +163,152 @@ class commonStudios extends Component {
             return <p>Server is not responding....   oh shit.</p>
         }
     }
+
+    handleOptionSelect = e => {
+        const d = document.getElementById("upper").value;
+        console.log(d)
+        console.log(e)
+        console.log(e.target.id)
+
+
+        var options = []
+        var i
+        if (e.target.id === "upper") {
+            const value = document.getElementById("upper").value;
+            for (i = 1; i <= value; i++) {
+                const newOption = {
+                    value: i,
+                    label: i, //todo remove
+                    stateAssociation: "lower" //todo remove
+                }
+                options.push(newOption)
+            }
+            this.setState({
+                lowerOptions: options,
+                upper: value
+            })
+        } else if (e.target.id === "lower") {
+            const value = document.getElementById("lower").value
+            for (i = value; i <= 10; i++) {
+                const newOption = {
+                    value: i,
+                    label: i,
+                    stateAssociation: "lower" //todo remove
+                }
+                options.push(newOption)
+            }
+            this.setState({
+                upperOptions: options,
+                lower: value
+            })
+        } else if (e.target.id === "commonCount") {
+            this.setState({
+                commonStudioCount: document.getElementById("commonCount").value,
+            })
+        }
+    }
+
+    renderOptions = option => {
+        return <option value = {option.value} key = {option.value}> {option.value} </option>
+    }
     
     render () {
-
-
-
         return (
-            <div className = "feature">
-                <div className = "input">
-                    <form onSubmit={this.getCommonStudios}>
-                        <label>
-                            MyAnimeList Username:
-                            <br/>
-                            <input
-                                name = "userName"
-                                type = "text"
-                                value = {this.state.userName}
-                                onChange = {this.handleInputChange}
-                            /> 
-                        </label>
-                        <br/>
+            <div>
+                <section className = "section">
+                    
+
                         
-                        <label>
-                            Upper:
-                            <Select
-                                onChange = {this.handleSelectChange}
-                                options = {this.state.upperOptions}
-                            />
-                        </label>
-                        <label>
-                            Lower:
-                            <Select
-                                onChange = {this.handleSelectChange}
-                                options = {this.state.lowerOptions}
-                            />
-                        </label>
-                        <label>
-                            Common Studio Count:
-                            <Select
-                                onChange = {this.handleSelectChange}
-                                options = {this.state.commonStudioCountOptions}
-                            />
-                        </label>
-                        <br/>
-                        <input type="submit" value="Submit"/>
-                    </form>
-                </div>
+                        <div className="field">
+                            <label className="label">MyAnimeList Username:</label>
+                            <div className="control">
+                                <input 
+                                    className="input is-small" 
+                                    type="text"
+                                    name = "userName"
+                                    value = {this.state.userName}
+                                    onChange = {this.handleInputChange}
+                                />
+                            </div>
+                        </div>
+
+
+                        <div className = "columns">
+                            <div className="column is-one-third">
+                                <div className="field">
+                                    <label className="label">Upper Score Bound</label>
+
+                                    <div className = "select" onChange = {this.handleOptionSelect}>
+                                        <select id = "upper">
+                                            {this.state.upperOptions.map(this.renderOptions)}
+                                        </select>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <div className="column is-one-third">
+                                <div className="field">
+                                    <label className="label">Lower Score Bound</label>
+
+                                    <div className = "select" onChange = {this.handleOptionSelect}>
+                                        <select id = "lower">
+                                            {this.state.lowerOptions.map(this.renderOptions)}
+                                        </select>
+                                    </div>
+                                    
+                                </div>
+                            </div>
+
+                            <div className="column is-one-third">
+                                <div className="field">
+                                    <label className="label">Common Studio Count</label>
+
+                                    <div className = "select" onChange = {this.handleOptionSelect}>
+                                        <select id = "commonCount">
+                                            {this.state.commonStudioCountOptions.map(this.renderOptions)}
+                                        </select>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        
+
+                        
+
+                       
+
+
+
+                        
+                        
+
+                        <button className = "button"
+                        onClick={this.getCommonStudios}>
+                            Submit
+                        </button>
+
+
+                </section>
                 
-                <div className = "output">
+                <section className = "section">
                 {                    
                         //Only display on ok response from backend
                         this.state.okResponse &&
-                            <BarGraph 
-                                data = {this.state.studios}
-                                barColor = "hsl(214, 99%, 78%)"
-                                highlightColor = "hsl(214, 99%, 58%)"
-                            />
-                        
+                            <div className = "box">
+                                <BarGraph 
+                                    data = {this.state.studios}
+                                    barColor = "hsl(214, 99%, 78%)"
+                                    highlightColor = "hsl(214, 99%, 58%)"
+                                />  
+                            </div>
+
+                            
                     }
                     {this.renderError()}
-                </div>
+                </section>
             </div>
         )
     }

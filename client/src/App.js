@@ -1,7 +1,7 @@
 import React, { Component }  from 'react';
 import {HashRouter} from "react-router-dom";
 //Styles
-import './App.css';
+import './App.sass';
 //Components
 import Content from './components/content/content'
 import Navigation from './components/navigation/navigation'
@@ -13,8 +13,24 @@ class App extends Component {
       <HashRouter>
         <div className="App">
           <Banner/>
-          <Navigation/>
-          <Content/>
+          <section className = "section">
+            <div className = "columns">
+              <div className="column is-one-fifth">
+                <div className = "box">
+                  <Navigation/>
+                </div>
+              </div>
+              <div className="column">
+                <div className = "box">
+                  <Content/>
+                </div>
+              </div>
+            </div>
+          </section>
+
+
+          
+          
         </div>
       </HashRouter>
     )

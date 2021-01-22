@@ -64,8 +64,20 @@ Note: All code instructions are assumed to be ran from root of repo
 
 * nivo
   * react library used for graphical data representation
-  * lots of neat examples on the [website](https://nivo.rocks/)
+  * lots of neat interactive examples on the [website](https://nivo.rocks/)
+  * fantastic documentation
   * `yarn add @nivo/core @nivo/bar`
+
+* bulma.io
+  * a css library that is very responsive and good for mobile too
+  * has some pretty good documentation
+  * [check it out](https://bulma.io/)
+  * `npm install bulma`
+
+* node-sass
+  * for getting bulma to work with react
+  * a specific version is needed for compatability purposes
+  * `npm install npm install node-sass@4.14.1`
   
 ## Design
 Note: Diagrams made with https://mermaid-js.github.io/mermaid/#/

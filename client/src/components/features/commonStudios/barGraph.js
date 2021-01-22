@@ -6,7 +6,7 @@ class barGraph extends Component {
     state = {
         data : this.props.data,
         barColor: this.props.barColor,
-        highlightColor : this.props.highlightColor
+        highlightColor : this.props.highlightColor,
     }
 
     componentDidMount() {
@@ -28,7 +28,6 @@ class barGraph extends Component {
 
 
     //Todo, figure out how to pass params into callback functions
-    
     highlightBar = (data) => {
         this.changeBarColor(data.index, this.state.highlightColor)
     }
@@ -49,14 +48,14 @@ class barGraph extends Component {
     render () {
         return ( 
             <div>
-                <div style={{height: "400px"}}>
+                <div style = {{height: "600px", width: "99%"}}>
                     <ResponsiveBar
+                        //General
                         margin={{ top: 50, right: 80, bottom: 100, left: 100 }}
+                        //Data
                         data = {this.state.data}
                         keys = {["count"]}
                         indexBy = "studio"
-                        colorBy = "index"
-                        colors = {this.state.data.map(c => c.color)}
                         axisLeft = {
                             {
                                 legend: "Animes Produced",
@@ -72,7 +71,11 @@ class barGraph extends Component {
                                 tickRotation: 14,
                             }
                         }
+                        //Styling
+                        colorBy = "index"
+                        colors = {this.state.data.map(c => c.color)}
                         animate = {true}
+                        //Interactivity
                         onClick = {this.visitMALStudioPage}
                         onMouseEnter={
                             this.highlightBar
