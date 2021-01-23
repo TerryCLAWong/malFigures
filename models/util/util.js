@@ -1,6 +1,39 @@
 const Utils = {}
 
+/**
+ * Removes the animeList objects that have the statuses in the 'statuses' string
+ * statuses - string with the format: "status1,status2, etc.."
+ */
+Utils.removeStatus = (animeList, statuses) => {
+    for (let animeId in animeList) {
+        listEntry = animeList[animeId]
+        status = listEntry.list_status.status
 
+        if (statuses.split(',').indexOf(status) >= 0) {
+            console.log("what")
+            delete animeList[animeId]
+        }
+    }
+    return animeList
+}
+
+/**
+* Filters the animeList be removing objects that have a score outside of the [lower,upper] range
+*/
+Utils.removeScoreOutofRange = (animeList, upper, lower) => {
+    for (const animeId in animeList) {
+        animeScore = animeList[animeId].list_status.score
+        if (animeScore < lower || animeScore > upper) {
+            delete animeList[animeId]
+        }
+    }
+    return animeList
+}
+
+/**
+ * Gets user animelist with the indicated fields
+ * fields - string with the following format: "field1,field2,field3..."
+ */
 Utils.getAnimeList = async function getAnimeList(axios, accessToken, fields, userName) {
     authorization = "Bearer " + accessToken
     result = await axios({   
@@ -36,6 +69,7 @@ Utils.getAnimeList = async function getAnimeList(axios, accessToken, fields, use
     )
     return result
 }
+
 
 async function getAnimePages(data, axios, authorization, fields) {
     nextURL = null

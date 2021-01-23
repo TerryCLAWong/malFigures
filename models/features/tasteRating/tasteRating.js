@@ -1,5 +1,6 @@
 const Errors = require('../../errors/errors')
 const TasteRating = {}
+const Utils = require('../../util/util')
 
 // Validates request body parameters for CommonStaff
 const {body} = require('express-validator')
@@ -41,8 +42,52 @@ TasteRating.getTasteRating = function(axios, accessToken) {
         ok = Errors.checkValidationErrors(req, res, validationResult)
         if (ok == false) {return}
 
-        console.log("hey hello world")
-        //
+        //Get Animelist
+        userName = req.body.userName
+        fields = "list_status,mean,num_scoring_users"
+        result = await Utils.getAnimeList(axios, accessToken, fields, userName)
+        if (result.error != null) {
+            //Animelist GET for the user failed
+            res.status(502)
+            res.send(result.error)
+            return
+        }
+
+        
+
+        //Remove Scores out of range
+        filteredAnimeList = Utils.removeScoreOutofRange(result.animeList, req.body.upper, req.body.lower)
+        console.log(filteredAnimeList)
+        //Remove plan_to_watch, only want anime from user that have actually been watched
+        filteredAnimeList = Utils.removeStatus(filteredAnimeList, "plan_to_watch")
+
+        let scoringUsersLogSum = 0
+        let inaccuracy = 0
+        for (let animeId in filteredAnimeList) {
+            listEntry = filteredAnimeList[animeId]
+
+            //Multiplier
+            logFactor = Math.log10(listEntry.num_scoring_users)
+
+            //Add to denominator
+            scoringUsersLogSum += logFactor
+
+            console.log(scoringUsersLogSum)
+
+            //Calculate absolute difference between user score and average
+            difference = Math.abs(listEntry.mean - listEntry.list_status.score)
+
+            //Add to total
+            inaccuracy += (difference / 10) * logFactor
+        }
+
+        inaccuracy = inaccuracy / scoringUsersLogSum
+
+        console.log("inaccuracy is: ", inaccuracy)
+        console.log("taste rating is: ", 1-inaccuracy)
+
+
+
     }
 }
 

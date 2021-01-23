@@ -89,7 +89,7 @@ CommonStaff.getCommonStudios = function(axios, accessToken) {
         }
 
         //Remove anime out of score range
-        filteredAnimelist = removeScoreOutofRange(result.animeList, req.body.upper, req.body.lower)
+        filteredAnimelist = Utils.removeScoreOutofRange(result.animeList, req.body.upper, req.body.lower)
         console.log("Score filtering complete")
         console.log("Animelist with score filtering: \n", filteredAnimelist, "\n")
 
@@ -107,18 +107,6 @@ CommonStaff.getCommonStudios = function(axios, accessToken) {
     } 
 }
 
-/*
-Filters the animeList be removing objects that have a score outside of the [lower,upper] range
-*/
-function removeScoreOutofRange(animeList, upper, lower) {
-    for (const animeId in animeList) {
-        animeScore = animeList[animeId].list_status.score
-        if (animeScore < lower || animeScore > upper) {
-            delete animeList[animeId]
-        }
-    }
-    return animeList
-}
 
 function getStudioCounts(animeList, commonAnimeCount) {
     studioCounts = {}
