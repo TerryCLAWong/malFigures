@@ -5,7 +5,7 @@ const CommonStaff = {}
 /*
 Validates request body parameters for CommonStaff
 */
-const {body} = require('express-validator/check')
+const {body} = require('express-validator')
 CommonStaff.validate = (method) => {
     if (method == "getCommonEmployees" || method == "getCommonStudios") { //validation for both methods are the same
         
@@ -43,7 +43,7 @@ CommonStaff.validate = (method) => {
 }
 
 
-const {validationResult} = require('express-validator/check')
+const {validationResult} = require('express-validator')
 CommonStaff.getCommonEmployees = function(axios, accessToken) {
     return async (req, res) => {
         //Handle Errors post validation
@@ -81,7 +81,6 @@ CommonStaff.getCommonStudios = function(axios, accessToken) {
             res.status(502)
             res.send(result.error)
             return
-           // console.log("AAASASAASA" + result.error)
         }
 
         //Remove anime out of score range
