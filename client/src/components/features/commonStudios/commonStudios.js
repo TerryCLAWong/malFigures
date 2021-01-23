@@ -7,9 +7,9 @@ class commonStudios extends Component {
     state = {
         //Input
         userName: "",
-        upper: 0,
-        lower: 0,
-        commonStudioCount: 0,
+        upper: 1,
+        lower: 1,
+        commonStudioCount: 1,
         //Output
         studios : null,
         //Errors

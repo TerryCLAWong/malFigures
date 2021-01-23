@@ -1,5 +1,6 @@
 const Errors = require('../../errors/errors')
 const CommonStaff = {}
+const Utils = require('../../util/util')
 
 
 /*
@@ -54,7 +55,9 @@ CommonStaff.getCommonEmployees = function(axios, accessToken) {
         }
 
         //Get Animelist
-        result = await getAnimeList(req, axios, accessToken)
+        userName = req.body.userName
+        fields = "list_status,studios"
+        result = await Utils.getAnimeList(axios, accessToken, fields, userName) //await getAnimeList(req, axios, accessToken)
         
         //On Successful 
         if (result.error == null) {
@@ -75,7 +78,9 @@ CommonStaff.getCommonStudios = function(axios, accessToken) {
         ok = Errors.checkValidationErrors(req, res, validationResult)
         if (ok == false) {return}
         //Get Animelist
-        result = await getAnimeList(req, axios, accessToken)
+        userName = req.body.userName
+        fields = "list_status,studios"
+        result = await Utils.getAnimeList(axios, accessToken, fields, userName) //await getAnimeList(req, axios, accessToken)
         if (result.error != null) {
             //Animelist GET for the user failed
             res.status(502)
@@ -102,107 +107,12 @@ CommonStaff.getCommonStudios = function(axios, accessToken) {
     } 
 }
 
-async function getAnimeList(req, axios, accessToken) {
-    authorization = "Bearer " + accessToken
-    result = await axios({   
-        method: "get",
-        url: "https://api.myanimelist.net/v2/users/" + req.body.userName + "/animelist?",
-        params: {
-            "fields" : "list_status,studios",
-            "limit" : 1000, //limit max to maximize speed
-        },
-        headers: {
-            "Authorization" : authorization
-        }
-    }).then(
-        async function thing(response) {
-            console.log("Sucessful GET animelist: " + req.body.userName)//todo remove
-            //Get Animelist
-            data = response.data
-            result = await getAnimePages(data, axios, authorization)
-
-            //Return
-            if (result.error == null) {
-                return {error: null, animeList: result.animeList}
-            }
-            MALAPIError = {"MAL API Error": result.error}
-            return {error: MALAPIError}    
-        }
-    ).catch(
-        (error) => {
-            console.log("Failed GET animelist: " + req.body.userName) //todo remove
-            MALAPIError = {"MAL_API_Error": error.response.data.error}
-            return {error: MALAPIError, data: null}
-        }
-    )
-    return result
-}
-
-async function getAnimePages(data, axios) {
-    nextURL = null
-    animeList = {}
-    /*
-    The successful response does not return all anime in the animelist
-    More are given in response.paging.next
-    */
-    while (true) {
-        //Get next set of animes
-        if (nextURL != null) { //ignore first page
-            //Get next URL's response
-            result = await axios.get(nextURL, {headers: {"Authorization": authorization}}
-            ).then((response) => {
-                console.log("finished reading anime page")
-                return {
-                    error: null,
-                    data : response.data
-                }
-            }).catch((error) => {
-                console.log("Failed to get a page from the animelist")
-                return {
-                    error : error.response.data.error,
-                    data : null
-                }
-            })
-
-            //Set next set of data if applicable
-            if (result.error == null) {
-                data = result.data
-            } else {
-                return {
-                    error: result.error,
-                    status: 502,
-                    message: "Failed to get a page from the animelist" //todo - maybe not needed
-                }
-            }
-        }
-
-        //Append entries to animeList
-        for (let animeEntry of data.data) {
-            //Get needed values
-            animeId = animeEntry.node.id
-            anime = {}
-            anime.score = animeEntry.list_status.score
-            anime.title = animeEntry.node.title 
-            anime.studios = animeEntry.node.studios
-            //Append to animeList
-            animeList[animeId] = anime
-        }
-
-        //Set next URL or exit
-        if (data.paging.next == null) {
-            return {animeList: animeList}
-        } else {
-            nextURL = data.paging.next
-        }
-    }
-}
-
 /*
 Filters the animeList be removing objects that have a score outside of the [lower,upper] range
 */
 function removeScoreOutofRange(animeList, upper, lower) {
     for (const animeId in animeList) {
-        animeScore = animeList[animeId].score
+        animeScore = animeList[animeId].list_status.score
         if (animeScore < lower || animeScore > upper) {
             delete animeList[animeId]
         }
