@@ -53,47 +53,116 @@ TasteRating.getTasteRating = function(axios, accessToken) {
             return
         }
 
-        let differenceRangeCounts = initDifferenceRangeCounts()
-
         //Remove Scores out of range
         filteredAnimeList = Utils.removeScoreOutofRange(result.animeList, req.body.upper, req.body.lower)
         
         //Remove plan_to_watch, only want anime from user that have actually been watched
         filteredAnimeList = Utils.removeStatus(filteredAnimeList, "plan_to_watch")
 
-        
+        //Response for empty animeList
+        if (Object.keys(filteredAnimeList).length === 0) {
+            res.status(204)
+            res.send({
+                "message" : "no scored, watched anime in list for user: " + req.userName 
+            })
+            return
+        }   
 
-        let scoringUsersLogSum = 0
-        let inaccuracy = 0
-        for (let animeId in filteredAnimeList) {
-            listEntry = filteredAnimeList[animeId]
+        //Calculate Taste Rating
+        result = calculateRating(filteredAnimeList)
 
-            //Multiplier
-            logFactor = Math.log10(listEntry.num_scoring_users)
+        //log printing
+        console.log("avg rating difference is: ", result.inaccuracy)
+        console.log(result.differenceRangeCounts)
 
-            //Add to denominator
-            scoringUsersLogSum += logFactor
+        let data = convertObjectToDataList(result.differenceRangeCounts)
 
-            //Calculate absolute difference between user score and average
-            difference = Math.abs(listEntry.mean - listEntry.list_status.score)
-
-            //Increment difference ranges
-            incrementDifferenceRangeCounts(differenceRangeCounts, difference)
-
-            //Add to total
-            inaccuracy += (difference) * logFactor
-        }
-
-        inaccuracy = (inaccuracy / scoringUsersLogSum).toFixed(3)
-
-        console.log("inaccuracy is: ", inaccuracy)
-        //console.log("taste rating is: ", 1-inaccuracy)
-
-        console.log(differenceRangeCounts)
-
-
+        //Return Response
+        res.status(200)
+        res.send({
+            "avg_rating_difference": result.inaccuracy,
+            "data" : data
+        })
+        return
 
     }
+}
+
+function calculateRating(animeList) {
+    let differenceRangeCounts = initDifferenceRangeCounts()
+
+    let scoringUsersLogSum = 0
+    let inaccuracy = 0
+    for (let animeId in filteredAnimeList) {
+        listEntry = filteredAnimeList[animeId]
+
+        //Multiplier
+        logFactor = Math.log10(listEntry.num_scoring_users)
+
+        //Add to denominator
+        scoringUsersLogSum += logFactor
+
+        //Calculate absolute difference between user score and average
+        difference = Math.abs(listEntry.mean - listEntry.list_status.score)
+
+        //Increment difference ranges
+        incrementDifferenceRangeCounts(differenceRangeCounts, difference)
+
+        //Add to total
+        inaccuracy += (difference) * logFactor
+    }
+
+    inaccuracy = (inaccuracy / scoringUsersLogSum).toFixed(3)
+
+    return {
+        differenceRangeCounts: differenceRangeCounts,
+        inaccuracy: inaccuracy
+    }
+}
+
+/*
+data for pie chart should look like 
+[
+        {
+            label
+            value
+            color
+        }
+]
+*/
+
+function convertObjectToDataList(differenceRangeCounts) {
+    data = []
+    for (const key of Object.keys(differenceRangeCounts)) {
+        let dataEntry = {}
+        dataEntry.label = key
+        dataEntry.value = differenceRangeCounts[key]
+        switch (key) {
+            case "s":
+                dataEntry.color = "hsl(126, 50%, 56%)"
+                break;
+            case "a": 
+                dataEntry.color = "hsl(105, 50%, 56%)"
+                break;
+            case "b": 
+                dataEntry.color = "hsl(84, 50%, 56%)"
+                break;
+            case "c": 
+                dataEntry.color = "hsl(63, 50%, 56%)"   
+                break; 
+            case "d": 
+                dataEntry.color = "hsl(42, 50%, 56%)" 
+                break;   
+            case "e": 
+                dataEntry.color = "hsl(21, 50%, 56%)"
+                break;    
+            case "f": 
+                dataEntry.color = "hsl(0, 50%, 56%)"    
+        }
+        data.push(dataEntry)
+    }
+
+    return data
 }
 
 function initDifferenceRangeCounts() {
