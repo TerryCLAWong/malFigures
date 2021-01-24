@@ -53,13 +53,15 @@ TasteRating.getTasteRating = function(axios, accessToken) {
             return
         }
 
-        
+        let differenceRangeCounts = initDifferenceRangeCounts()
 
         //Remove Scores out of range
         filteredAnimeList = Utils.removeScoreOutofRange(result.animeList, req.body.upper, req.body.lower)
-        console.log(filteredAnimeList)
+        
         //Remove plan_to_watch, only want anime from user that have actually been watched
         filteredAnimeList = Utils.removeStatus(filteredAnimeList, "plan_to_watch")
+
+        
 
         let scoringUsersLogSum = 0
         let inaccuracy = 0
@@ -72,22 +74,55 @@ TasteRating.getTasteRating = function(axios, accessToken) {
             //Add to denominator
             scoringUsersLogSum += logFactor
 
-            console.log(scoringUsersLogSum)
-
             //Calculate absolute difference between user score and average
             difference = Math.abs(listEntry.mean - listEntry.list_status.score)
 
+            //Increment difference ranges
+            incrementDifferenceRangeCounts(differenceRangeCounts, difference)
+
             //Add to total
-            inaccuracy += (difference / 10) * logFactor
+            inaccuracy += (difference) * logFactor
         }
 
-        inaccuracy = inaccuracy / scoringUsersLogSum
+        inaccuracy = (inaccuracy / scoringUsersLogSum).toFixed(3)
 
         console.log("inaccuracy is: ", inaccuracy)
-        console.log("taste rating is: ", 1-inaccuracy)
+        //console.log("taste rating is: ", 1-inaccuracy)
+
+        console.log(differenceRangeCounts)
 
 
 
+    }
+}
+
+function initDifferenceRangeCounts() {
+    let differenceRangeCounts = {}
+    differenceRangeCounts.s = 0
+    differenceRangeCounts.a = 0
+    differenceRangeCounts.b = 0
+    differenceRangeCounts.c = 0
+    differenceRangeCounts.d = 0
+    differenceRangeCounts.e = 0
+    differenceRangeCounts.f = 0
+    return differenceRangeCounts
+}
+
+function incrementDifferenceRangeCounts(differenceRangeCounts, difference) {
+    if (difference <= 0.5) {
+        differenceRangeCounts.s ++
+    } else if (difference <= 1) {
+        differenceRangeCounts.a ++
+    } else if (difference <= 2) {
+        differenceRangeCounts.b ++
+    } else if (difference <= 3.5) {
+        differenceRangeCounts.c ++
+    } else if (difference <= 5) {
+        differenceRangeCounts.d ++
+    } else if (difference <= 7.5) {
+        differenceRangeCounts.e ++
+    } else if (difference <= 10) {
+        differenceRangeCounts.f ++
     }
 }
 
