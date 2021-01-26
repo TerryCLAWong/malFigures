@@ -11,7 +11,6 @@ class barGraph extends Component {
 
     componentDidMount() {
         const dataCopy = Array.from(this.state.data)
-        console.log(this.state)
         //add state.barColor to all of the data
         dataCopy.map(
             entry => entry.color = this.state.barColor

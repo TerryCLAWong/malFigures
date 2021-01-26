@@ -2,28 +2,30 @@ import axios from 'axios'
 import React, { Component }  from 'react'
 import PieChart from './pieChart'
 import './tasteRating.css'
-import {HandleInputStringChange} from '../../helpers/inputHelpers'
 import StringInput from '../../input/stringInput'
+import NumericSelect from '../../input/numericSelect'
+import {HandleInputStringChange, HandleOptionSelect} from '../../helpers/inputHelpers'
+
 
 class tasteRating extends Component {   
-
-    state = {
-        //Response
-        okResponse: false,
-        //Input
-        userName: "",
-        upper: 1,
-        lower: 1,
-        //Select Options
-        upperOptions: [],
-        lowerOptions: [],
-        //Output
-        data: [],
-    }
-
     constructor(props) {
         super(props)
 
+        this.state = {
+            //Response
+            okResponse: false,
+            //Input
+            userName: "",
+            upper: 1,
+            lower: 1,
+            //Select Options
+            upperOptions: [],
+            lowerOptions: [],
+            //Output
+            data: [],
+        }
+
+        this.handleOptionSelect = HandleOptionSelect.bind(this)
         this.handleInputChange = HandleInputStringChange.bind(this)
     }
 
@@ -33,30 +35,15 @@ class tasteRating extends Component {
 
     optionsSetup = () => {
         var options = []
-        var i
-        var option
         
-        //Upper options
-        for (i = 1; i <= 10; i++) {
-            option = {
+        for (let i = 1; i <= 10; i++) {
+            let option = {
                 value: i,
-                label: i,
-                stateAssociation: "upper"
             }
             options.push(option)
         }
         this.setState({
             upperOptions: options,
-        })
-        //Lower options
-        options = []
-        for (i = 1; i <= 10; i++) {
-            option = {
-                value: i,
-            }
-            options.push(option)
-        }
-        this.setState({
             lowerOptions: options,
         })
     }
@@ -70,45 +57,6 @@ class tasteRating extends Component {
         return true
     }
 
-    
-
-    handleOptionSelect = e => {
-        var options = []
-        var i
-        if (e.target.id === "upper") {
-            const value = document.getElementById("upper").value;
-            for (i = 1; i <= value; i++) {
-                const newOption = {
-                    value: i,
-                    label: i,
-                }
-                options.push(newOption)
-            }
-            
-            this.setState({
-                lowerOptions: options,
-                upper: value
-            })
-            
-        } else if (e.target.id === "lower") {
-            const value = document.getElementById("lower").value
-            for (i = value; i <= 10; i++) {
-                const newOption = {
-                    value: i,
-                    label: i,
-                }
-                options.push(newOption)
-            }
-            this.setState({
-                upperOptions: options,
-                lower: value
-            })
-        }
-    }
-
-    renderOptions = option => {
-        return <option value = {option.value} key = {option.value}> {option.value} </option>
-    }
 
     getTasteRating = (e) => {
         e.preventDefault(); //Prevents page/console reload
@@ -167,6 +115,7 @@ class tasteRating extends Component {
                         <label className="label">MyAnimeList Username:</label>
                             <div className="field">
                                 <StringInput
+                                    name = "userName"
                                     value = {this.state.userName}
                                     handler = {this.handleInputChange}
                                 />
@@ -178,12 +127,11 @@ class tasteRating extends Component {
                                     <div className="field">
                                         <label className="label">Upper Score Bound</label>
 
-                                        <div className = "select" onChange = {this.handleOptionSelect}>
-                                            <select id = "upper">
-                                                {this.state.upperOptions.map(this.renderOptions)}
-                                            </select>
-                                        </div>
-
+                                        <NumericSelect
+                                            id = "upper"
+                                            handler = {this.handleOptionSelect}
+                                            options = {this.state.upperOptions}
+                                        />
                                     </div>
                                 </div>
 
@@ -191,12 +139,11 @@ class tasteRating extends Component {
                                     <div className="field">
                                         <label className="label">Lower Score Bound</label>
 
-                                        <div className = "select" onChange = {this.handleOptionSelect}>
-                                            <select id = "lower">
-                                                {this.state.lowerOptions.map(this.renderOptions)}
-                                            </select>
-                                        </div>
-                                        
+                                        <NumericSelect
+                                            id = "lower"
+                                            handler = {this.handleOptionSelect}
+                                            options = {this.state.lowerOptions}
+                                        />
                                     </div>
                                 </div>
 
@@ -206,13 +153,7 @@ class tasteRating extends Component {
                             onClick={this.getTasteRating}>
                                 Submit    
                             </button>
-
-                        
                     </div>
-
-                    
-
-
                 </section>
 
                 {/* Output Content */}

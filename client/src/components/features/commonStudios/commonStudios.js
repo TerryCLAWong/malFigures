@@ -3,7 +3,8 @@ import React, { Component }  from 'react'
 import BarGraph from './barGraph'
 import './commonStudios.css'
 import StringInput from '../../input/stringInput'
-import {HandleInputStringChange} from '../../helpers/inputHelpers'
+import NumericSelect from '../../input/numericSelect'
+import {HandleInputStringChange, HandleOptionSelect} from '../../helpers/inputHelpers'
 
 
 class commonStudios extends Component {
@@ -30,6 +31,7 @@ class commonStudios extends Component {
             commonStudioCountOptions: [],
         }
 
+        this.handleOptionSelect = HandleOptionSelect.bind(this)
         this.handleInputChange = HandleInputStringChange.bind(this)
     }
 
@@ -47,8 +49,6 @@ class commonStudios extends Component {
         for (i = 1; i <= 10; i++) {
             option = {
                 value: i,
-                label: i,
-                stateAssociation: "upper"
             }
             options.push(option)
         }
@@ -111,8 +111,6 @@ class commonStudios extends Component {
             commonCount: parseInt(this.state.commonStudioCount)
         }
 
-        console.log(this.state, task)
-
         if (this.validateTask(task)) {
             console.log("Sending request body:")
             console.log(task)
@@ -174,48 +172,6 @@ class commonStudios extends Component {
             return <p>Bad inputs. Make sure everything is filled out.</p>
         }
     }
-
-    handleOptionSelect = e => {
-        var options = []
-        var i
-        if (e.target.id === "upper") {
-            const value = document.getElementById("upper").value;
-            for (i = 1; i <= value; i++) {
-                const newOption = {
-                    value: i,
-                    label: i,
-                }
-                options.push(newOption)
-            }
-            
-            this.setState({
-                lowerOptions: options,
-                upper: value
-            })
-            
-        } else if (e.target.id === "lower") {
-            const value = document.getElementById("lower").value
-            for (i = value; i <= 10; i++) {
-                const newOption = {
-                    value: i,
-                    label: i,
-                }
-                options.push(newOption)
-            }
-            this.setState({
-                upperOptions: options,
-                lower: value
-            })
-        } else if (e.target.id === "commonCount") {
-            this.setState({
-                commonStudioCount: document.getElementById("commonCount").value,
-            })
-        }
-    }
-
-    renderOptions = option => {
-        return <option value = {option.value} key = {option.value}> {option.value} </option>
-    }
     
     render () {
         return (
@@ -232,6 +188,7 @@ class commonStudios extends Component {
                             <div className="field">
                                 <label className="label">MyAnimeList Username:</label>
                                     <StringInput
+                                        name = "userName"
                                         value = {this.state.userName}
                                         handler = {this.handleInputChange}
                                     />
@@ -243,12 +200,11 @@ class commonStudios extends Component {
                                     <div className="field">
                                         <label className="label">Upper Score Bound</label>
 
-                                        <div className = "select" onChange = {this.handleOptionSelect}>
-                                            <select id = "upper">
-                                                {this.state.upperOptions.map(this.renderOptions)}
-                                            </select>
-                                        </div>
-
+                                        <NumericSelect
+                                            id = "upper"
+                                            handler = {this.handleOptionSelect}
+                                            options = {this.state.upperOptions}
+                                        />
                                     </div>
                                 </div>
 
@@ -256,25 +212,23 @@ class commonStudios extends Component {
                                     <div className="field">
                                         <label className="label">Lower Score Bound</label>
 
-                                        <div className = "select" onChange = {this.handleOptionSelect}>
-                                            <select id = "lower">
-                                                {this.state.lowerOptions.map(this.renderOptions)}
-                                            </select>
-                                        </div>
-                                        
+                                        <NumericSelect
+                                            id = "lower"
+                                            handler = {this.handleOptionSelect}
+                                            options = {this.state.lowerOptions}
+                                        />
                                     </div>
                                 </div>
 
                                 <div className="column is-one-fifth">
                                     <div className="field">
                                         <label className="label">Common Studio Count</label>
-
-                                        <div className = "select" onChange = {this.handleOptionSelect}>
-                                            <select id = "commonCount">
-                                                {this.state.commonStudioCountOptions.map(this.renderOptions)}
-                                            </select>
-                                        </div>
-
+                                    
+                                        <NumericSelect
+                                            id = "commonCount"
+                                            handler = {this.handleOptionSelect}
+                                            options = {this.state.commonStudioCountOptions}
+                                        />
                                     </div>
                                 </div>
                             </div>
@@ -301,17 +255,12 @@ class commonStudios extends Component {
                                     highlightColor = "hsl(214, 99%, 58%)"
                                 />  
                             </div>
-
-                            
                     }
                     {this.renderError()}
                 </section>
             </div>
         )
     }
-
-    
-
 }
 
 export default commonStudios
