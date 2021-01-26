@@ -135,6 +135,7 @@ function convertObjectToDataList(differenceRangeCounts) {
     data = []
     for (const key of Object.keys(differenceRangeCounts)) {
         let dataEntry = {}
+        dataEntry.id = key
         dataEntry.label = key
         dataEntry.value = differenceRangeCounts[key]
         switch (key) {

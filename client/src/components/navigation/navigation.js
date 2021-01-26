@@ -12,7 +12,7 @@ class Navigation extends Component {
                         <ul className = "menu-list">
                             <li> <NavLink to="/commonStudios">Common Studios</NavLink> </li>
 
-                            <li> <NavLink to="/f2">feature2</NavLink> </li>
+                            <li> <NavLink to="/tasteRating">Taste Rating</NavLink> </li>
 
                         </ul>
 

@@ -2,7 +2,7 @@ import React, { Component }  from 'react';
 import {Route} from "react-router-dom";
 //Features
 import commonStudios from "../features/commonStudios/commonStudios"
-import Feature2 from "../features/feature2"
+import tasteRating from "../features/tasteRating/tasteRating"
 
 
 class Content extends Component {
@@ -10,7 +10,7 @@ class Content extends Component {
         return (
             <div>
                 <Route path="/commonStudios" component={commonStudios}/>
-                <Route path="/f2" component={Feature2}/>
+                <Route path="/tasteRating" component={tasteRating}/>
             </div>
         )
     }

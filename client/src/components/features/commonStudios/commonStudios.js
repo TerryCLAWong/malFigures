@@ -1,34 +1,41 @@
 import axios from 'axios'
 import React, { Component }  from 'react'
 import BarGraph from './barGraph'
-import Select from 'react-select';
+import './commonStudios.css'
+import StringInput from '../../input/stringInput'
+import {HandleInputStringChange} from '../../helpers/inputHelpers'
+
 
 class commonStudios extends Component {
-    state = {
-        //Input
-        userName: "",
-        upper: 1,
-        lower: 1,
-        commonStudioCount: 1,
-        //Output
-        studios : null,
-        //Errors
-        okResponse: false,
-        userDNE: false,
-        tokenError: false,
-        disconnected: false,
-        //Select Options
-        upperOptions : [],
-        lowerOptions : [],
-        commonStudioCountOptions: [],
-        //Bargraph colors
+    constructor(props) {
+        super(props) //required
+        //Init state
+        this.state = {
+            //Input
+            userName: "",
+            upper: 1,
+            lower: 1,
+            commonStudioCount: 1,
+            //Output
+            studios : null,
+            //Errors
+            badInput: false,
+            okResponse: false,
+            userDNE: false,
+            tokenError: false,
+            disconnected: false,
+            //Select Options
+            upperOptions : [],
+            lowerOptions : [],
+            commonStudioCountOptions: [],
+        }
 
+        this.handleInputChange = HandleInputStringChange.bind(this)
     }
 
     componentDidMount() {
         //Set up for upper/lower
         this.optionsSetup()
-        
     }
 
     optionsSetup = () => {
@@ -71,15 +78,6 @@ class commonStudios extends Component {
             commonStudioCountOptions: options,
         })
     }
-
-    handleInputChange = (e) => {
-        const target = e.target
-        const value = target.value
-        const name = target.name
-        this.setState({
-            [name]: value //[] is the value of the variable
-        })
-    }
     
 
     validateTask = (task) => {
@@ -95,11 +93,15 @@ class commonStudios extends Component {
 
     getCommonStudios = (e) => {
         e.preventDefault(); //Prevents page/console reload
+
+        document.getElementById("studioSubmit").disabled = true;
+
         this.setState({
             userDNE: false,
             okResponse : false,
             tokenError: false,
-            disconnected: false
+            disconnected: false,
+            badInput: false
         })
 
         const task = {
@@ -125,6 +127,7 @@ class commonStudios extends Component {
                         studios : response.data.studios,
                         okResponse : true
                     })
+                    document.getElementById("studioSubmit").disabled = false
                 }
             )
             .catch(
@@ -147,11 +150,17 @@ class commonStudios extends Component {
                         }
                         //todo more cases
                     }
+                    document.getElementById("studioSubmit").disabled = false
                 }
             )
         } else {
-            alert("Bad inputs, try again")
+            document.getElementById("studioSubmit").disabled = false
+            this.setState({
+                badInputs : true
+            })
         }
+
+        
     }
 
     renderError = () => {
@@ -161,16 +170,12 @@ class commonStudios extends Component {
             return <p>Backend Token Issue, Sorry!!!</p>
         } else if (this.state.disconnected) {
             return <p>Server is not responding....   oh shit.</p>
+        } else if (this.state.badInputs) {
+            return <p>Bad inputs. Make sure everything is filled out.</p>
         }
     }
 
     handleOptionSelect = e => {
-        const d = document.getElementById("upper").value;
-        console.log(d)
-        console.log(e)
-        console.log(e.target.id)
-
-
         var options = []
         var i
         if (e.target.id === "upper") {
@@ -178,22 +183,22 @@ class commonStudios extends Component {
             for (i = 1; i <= value; i++) {
                 const newOption = {
                     value: i,
-                    label: i, //todo remove
-                    stateAssociation: "lower" //todo remove
+                    label: i,
                 }
                 options.push(newOption)
             }
+            
             this.setState({
                 lowerOptions: options,
                 upper: value
             })
+            
         } else if (e.target.id === "lower") {
             const value = document.getElementById("lower").value
             for (i = value; i <= 10; i++) {
                 const newOption = {
                     value: i,
                     label: i,
-                    stateAssociation: "lower" //todo remove
                 }
                 options.push(newOption)
             }
@@ -215,84 +220,76 @@ class commonStudios extends Component {
     render () {
         return (
             <div>
+
+                <h2 id = "commonStudiosTitle">
+                    Watched Anime Studios
+                </h2>
+
+                {/*Input Fields*/}
                 <section className = "section">
-                    
 
-                        
-                        <div className="field">
-                            <label className="label">MyAnimeList Username:</label>
-                            <div className="control">
-                                <input 
-                                    className="input is-small" 
-                                    type="text"
-                                    name = "userName"
-                                    value = {this.state.userName}
-                                    onChange = {this.handleInputChange}
-                                />
+                        <div className = "control">
+                            <div className="field">
+                                <label className="label">MyAnimeList Username:</label>
+                                    <StringInput
+                                        value = {this.state.userName}
+                                        handler = {this.handleInputChange}
+                                    />
                             </div>
+
+
+                            <div className = "columns is-mobile"> {/* TODO change so that the selects look better on mobile */}
+                                <div className="column is-one-fifth">
+                                    <div className="field">
+                                        <label className="label">Upper Score Bound</label>
+
+                                        <div className = "select" onChange = {this.handleOptionSelect}>
+                                            <select id = "upper">
+                                                {this.state.upperOptions.map(this.renderOptions)}
+                                            </select>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                                <div className="column is-one-fifth">
+                                    <div className="field">
+                                        <label className="label">Lower Score Bound</label>
+
+                                        <div className = "select" onChange = {this.handleOptionSelect}>
+                                            <select id = "lower">
+                                                {this.state.lowerOptions.map(this.renderOptions)}
+                                            </select>
+                                        </div>
+                                        
+                                    </div>
+                                </div>
+
+                                <div className="column is-one-fifth">
+                                    <div className="field">
+                                        <label className="label">Common Studio Count</label>
+
+                                        <div className = "select" onChange = {this.handleOptionSelect}>
+                                            <select id = "commonCount">
+                                                {this.state.commonStudioCountOptions.map(this.renderOptions)}
+                                            </select>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button id = "studioSubmit" className = "button is-primary"
+                            onClick={this.getCommonStudios}>
+                                Submit    
+                            </button>
+
                         </div>
-
-
-                        <div className = "columns">
-                            <div className="column is-one-third">
-                                <div className="field">
-                                    <label className="label">Upper Score Bound</label>
-
-                                    <div className = "select" onChange = {this.handleOptionSelect}>
-                                        <select id = "upper">
-                                            {this.state.upperOptions.map(this.renderOptions)}
-                                        </select>
-                                    </div>
-
-                                </div>
-                            </div>
-
-                            <div className="column is-one-third">
-                                <div className="field">
-                                    <label className="label">Lower Score Bound</label>
-
-                                    <div className = "select" onChange = {this.handleOptionSelect}>
-                                        <select id = "lower">
-                                            {this.state.lowerOptions.map(this.renderOptions)}
-                                        </select>
-                                    </div>
-                                    
-                                </div>
-                            </div>
-
-                            <div className="column is-one-third">
-                                <div className="field">
-                                    <label className="label">Common Studio Count</label>
-
-                                    <div className = "select" onChange = {this.handleOptionSelect}>
-                                        <select id = "commonCount">
-                                            {this.state.commonStudioCountOptions.map(this.renderOptions)}
-                                        </select>
-                                    </div>
-
-                                </div>
-                            </div>
-                        </div>
-
-                        
-
-                        
-
                        
-
-
-
-                        
-                        
-
-                        <button className = "button"
-                        onClick={this.getCommonStudios}>
-                            Submit
-                        </button>
-
-
                 </section>
                 
+
+                {/*Output Section*/}
                 <section className = "section">
                 {                    
                         //Only display on ok response from backend
