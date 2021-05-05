@@ -7,7 +7,10 @@ This is a web-app that looks at a given public myanimelist.net anime list and ca
 * have node.js installed
 * clone repo
 * install dependencies (additional ones listed below)
-  * should only need to do `npm install` and `npm install react` which **should** take care of the other dependencies...
+  * for server
+    * `npm install`, `npm audit fix`  
+  * for client
+    * `cd client`, `npm install`, `npm audit fix`    
 * create .env file containing an `ACCESS_TOKEN` variable containing your MAL API access token. To generate one, follow the instructions here: https://myanimelist.net/blog.php?eid=835707
 * `npm run dev`
 
