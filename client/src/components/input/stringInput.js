@@ -7,7 +7,7 @@ class stringInput extends Component {
                 <input 
                     className="input is-small" 
                     type="text"
-                    name = "userName"
+                    name = {this.props.name}
                     value = {this.props.value}
                     onChange = {this.props.handler}
                 />
